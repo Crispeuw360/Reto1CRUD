@@ -4,7 +4,7 @@ USE RetoCRUD;
 
 CREATE TABLE Profile_(
     user_code INT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(30),
+    user_name VARCHAR(30) unique NOT NULL,
     passwd VARCHAR(20),
     email VARCHAR(40),
     name_ VARCHAR(20),
