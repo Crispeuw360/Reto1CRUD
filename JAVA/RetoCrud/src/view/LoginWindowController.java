@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import controller.Controller;
 
 /**
  * FXML Controller class
@@ -22,6 +23,7 @@ import javafx.scene.layout.AnchorPane;
  * @author 2dami
  */
 public class LoginWindowController implements Initializable {
+    private Controller controller;
 
     @FXML
     private AnchorPane backgroundPanel;
@@ -49,11 +51,16 @@ public class LoginWindowController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        controller = new Controller();
     }    
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
+        if (controller.checkUser(usernameField.getText(), passwordField.getText())) {
+            msgLabel.setText("Usuario o contraseña correctos");
+        }else{
+            msgLabel.setText("Usuario o contraseña incorrectos");
+        }
     }
     
 }
