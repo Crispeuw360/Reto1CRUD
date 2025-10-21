@@ -57,5 +57,10 @@
             <Font name="SansSerif Bold" size="20.0" />
          </font>
       </Label>
+      <Button id="ConfirmBtn" fx:id="exitBtn" layoutY="6.0" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="91.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Exit" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font>
+      </Button>
     </children>
 </AnchorPane>

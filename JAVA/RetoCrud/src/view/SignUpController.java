@@ -7,44 +7,39 @@ package view;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.shape.Circle;
 
 /**
  * FXML Controller class
  *
  * @author 2dami
  */
-public class FXMLDocumentController implements Initializable {
+public class SignUpController implements Initializable {
 
     @FXML
-    private Label label;
+    private Button btnBack;
     @FXML
-    private Button ConfirmBtn;
+    private Button btnRegistro;
     @FXML
-    private PasswordField passwordField;
+    private TextField fieldUser;
     @FXML
-    private TextField usernameField;
+    private TextField fieldName;
     @FXML
-    private Circle avatarIcon;
+    private TextField fieldSurname;
     @FXML
-    private Label usernameLabel;
+    private TextField fieldGmail;
     @FXML
-    private Label passwordLabel;
+    private TextField fieldTel;
     @FXML
-    private Label passwordConfirmLabel;
+    private PasswordField fieldPass;
     @FXML
-    private PasswordField passwordConfirmField;
+    private PasswordField fieldPass2;
     @FXML
-    private Label deleteLabel;
-    @FXML
-    private Button exitBtn;
+    private Button btnShow;
 
     /**
      * Initializes the controller class.
@@ -53,9 +48,5 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }    
-
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-    }
     
 }
