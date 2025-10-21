@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #94B4C1;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.AdminViewController">
+   <children>
+      <Label fx:id="userLabel" layoutX="220.0" layoutY="64.0" text="Username:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="nameLabel" layoutX="224.0" layoutY="106.0" text="Name:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="surnameLabel" layoutX="224.0" layoutY="149.0" text="Surname:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+      <Label fx:id="mailLabel" layoutX="228.0" layoutY="193.0" text="Gmail:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+      <Label fx:id="phoneLabel" layoutX="226.0" layoutY="235.0" text="Telephone:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+      <Label fx:id="passLabel" layoutX="228.0" layoutY="282.0" text="Password: ">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+      <TextField fx:id="userField" layoutX="336.0" layoutY="64.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+      <TextField fx:id="nameField" layoutX="337.0" layoutY="106.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+      <TextField fx:id="surnameField" layoutX="338.0" layoutY="149.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+      <TextField fx:id="mailField" layoutX="338.0" layoutY="193.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+      <TextField fx:id="phoneField" layoutX="339.0" layoutY="235.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+      <ComboBox fx:id="userBox" layoutX="33.0" layoutY="64.0" prefWidth="150.0" style="-fx-background-radius: 50;" />
+      <Button fx:id="modify" layoutX="284.0" layoutY="335.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="65.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Modify" textFill="WHITE" />
+      <Button fx:id="delete" layoutX="377.0" layoutY="335.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="66.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Delete" textFill="WHITE" />
+      <Button fx:id="back" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="56.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Back" textFill="WHITE" />
+      <PasswordField layoutX="339.0" layoutY="281.0" prefHeight="26.0" prefWidth="172.0" style="-fx-background-radius: 50;" />
+   </children>
+</AnchorPane>
