@@ -15,16 +15,16 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label fx:id="nameLabel" layoutX="224.0" layoutY="106.0" text="Name:">
+      <Label fx:id="nameLabel" layoutX="226.0" layoutY="106.0" text="Name:">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label fx:id="surnameLabel" layoutX="224.0" layoutY="149.0" text="Surname:">
+      <Label fx:id="surnameLabel" layoutX="226.0" layoutY="149.0" text="Surname:">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Label>
-      <Label fx:id="mailLabel" layoutX="228.0" layoutY="193.0" text="Gmail:">
+      <Label fx:id="mailLabel" layoutX="226.0" layoutY="193.0" text="Gmail:">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Label>
@@ -32,7 +32,7 @@
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Label>
-      <Label fx:id="passLabel" layoutX="228.0" layoutY="282.0" text="Password: ">
+      <Label fx:id="passLabel" layoutX="226.0" layoutY="282.0" text="Password: ">
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Label>
