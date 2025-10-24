@@ -18,11 +18,5 @@ public class Controller {
         this.userDAO = new ImplementsBD();
     }
     
-    public boolean checkUser(String username, String password) {
-        return userDAO.checkUser(username, password);
-    }
     
-    public User_ showUser(String username) {
-        return userDAO.showUser(username);
-    }
 }

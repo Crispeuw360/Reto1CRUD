@@ -55,12 +55,6 @@ public class LoginWindowController implements Initializable {
     }    
 
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        if (controller.checkUser(usernameField.getText(), passwordField.getText())) {
-            msgLabel.setText("Usuario o contraseña correctos");
-        }else{
-            msgLabel.setText("Usuario o contraseña incorrectos");
-        }
-    }
+    
     
 }

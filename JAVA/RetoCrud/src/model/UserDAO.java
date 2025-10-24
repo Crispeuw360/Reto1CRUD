@@ -10,6 +10,5 @@ package model;
  * @author 2dami
  */
 public interface UserDAO {
-    public boolean checkUser(String username, String password);
-    public User_ showUser(String username);
+    
 }
