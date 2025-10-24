@@ -60,7 +60,7 @@ public class ImplementsBD implements UserDAO {
             e.printStackTrace();
         }
     }
-     public boolean existsUsername(String username) {
+     public boolean existsUser(String username) {
         boolean exists = false;
 
         try {

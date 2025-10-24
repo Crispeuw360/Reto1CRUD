@@ -10,5 +10,7 @@ package model;
  * @author 2dami
  */
 public interface UserDAO {
+    public boolean existsUser(String username);
     
+    public boolean insertUser(User_ user);
 }

@@ -5,6 +5,7 @@
  */
 package view;
 
+import controller.Controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -70,6 +71,7 @@ public class SignUpController implements Initializable {
     
     
     private ImplementsBD bd = new ImplementsBD(); // acceso a BD
+    private Controller con = new Controller(); 
     private boolean passwordsVisible = false;    // para mostrar/ocultar contraseñas
     /**
      * Initializes the controller class.
@@ -158,12 +160,12 @@ public class SignUpController implements Initializable {
                 comboGender.getValue()
         );
         boolean exists=false;
-        if (exists= bd.existsUsername(fieldUser.getText())){
+        if (con.existsUser(fieldUser.getText())){
             System.out.println("Usuario ya existente");
             showError("Usuario ya existente");
         }
         else{
-          boolean creado = bd.insertUser(nuevoUser);
+          boolean creado = con.insertUser(nuevoUser);
           
           if (creado){
               System.out.println("Creado correctamente");

@@ -54,7 +54,6 @@ public class LoginWindowController implements Initializable {
         controller = new Controller();
     }    
 
-    @FXML
-    
-    
 }
+    
+    
