@@ -14,48 +14,53 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.shape.Circle;
+import javafx.scene.layout.AnchorPane;
+import controller.Controller;
 
 /**
  * FXML Controller class
  *
  * @author 2dami
  */
-public class FXMLDocumentController implements Initializable {
+public class LoginWindowController implements Initializable {
+    private Controller controller;
 
     @FXML
-    private Label label;
+    private AnchorPane backgroundPanel;
     @FXML
-    private Button ConfirmBtn;
+    private Button loginBtn;
+    @FXML
+    private Label label;
     @FXML
     private PasswordField passwordField;
     @FXML
     private TextField usernameField;
     @FXML
-    private Circle avatarIcon;
-    @FXML
     private Label usernameLabel;
     @FXML
     private Label passwordLabel;
     @FXML
-    private Label passwordConfirmLabel;
+    private Label loginLabel;
     @FXML
-    private PasswordField passwordConfirmField;
+    private Button signupBtn;
     @FXML
-    private Label deleteLabel;
-    @FXML
-    private Button exitBtn;
+    private Label msgLabel;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        controller = new Controller();
     }    
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
+        if (controller.checkUser(usernameField.getText(), passwordField.getText())) {
+            msgLabel.setText("Usuario o contraseña correctos");
+        }else{
+            msgLabel.setText("Usuario o contraseña incorrectos");
+        }
     }
     
 }

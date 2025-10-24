@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="backgroundPanel" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #94B4C1;;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.LoginWindowController">
+    <children>
+        <Button id="LoginBtn" fx:id="loginBtn" layoutX="122.0" layoutY="328.0" onAction="#handleButtonAction" prefHeight="31.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Log In" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font></Button>
+        <Label id="invisibleLabel" fx:id="label" layoutX="21.0" layoutY="422.0" minHeight="16" minWidth="69" prefHeight="21.0" prefWidth="201.0" textFill="#213448">
+         <font>
+            <Font name="SansSerif Bold" size="17.0" />
+         </font></Label>
+      <PasswordField id="passwordField" fx:id="passwordField" layoutX="122.0" layoutY="236.0" prefHeight="31.0" prefWidth="369.0" style="-fx-background-color: #D9D9D9; -fx-background-radius: 50;">
+         <font>
+            <Font name="SansSerif Regular" size="15.0" />
+         </font>
+      </PasswordField>
+      <TextField id="usernameField" fx:id="usernameField" layoutX="122.0" layoutY="160.0" prefHeight="31.0" prefWidth="369.0" style="-fx-background-color: #D9D9D9; -fx-background-radius: 50;">
+         <font>
+            <Font name="SansSerif Regular" size="15.0" />
+         </font>
+      </TextField>
+      <Label id="usernameLabel" fx:id="usernameLabel" layoutX="122.0" layoutY="132.0" prefHeight="21.0" prefWidth="134.0" text="Username" textFill="#213448">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label id="passwordLabel" fx:id="passwordLabel" layoutX="122.0" layoutY="207.0" prefHeight="21.0" prefWidth="134.0" text="Password" textFill="#213448">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label id="LogInLabel" fx:id="loginLabel" layoutX="273.0" layoutY="25.0" prefHeight="23.0" prefWidth="68.0" text="Log In" textFill="#213448">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font>
+      </Label>
+      <Button id="SignUpBtn" fx:id="signupBtn" layoutX="307.0" layoutY="328.0" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="SansSerif Bold" size="20.0" />
+         </font>
+      </Button>
+      <Label fx:id="msgLabel" layoutX="99.0" layoutY="389.0" prefHeight="31.0" prefWidth="403.0" />
+    </children>
+</AnchorPane>

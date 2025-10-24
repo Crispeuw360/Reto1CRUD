@@ -6,7 +6,6 @@
 package model;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +15,7 @@ import java.util.ResourceBundle;
  *
  * @author pablo
  */
-public class ImplementsBD implements WorkerDAO {
+public class ImplementsBD implements UserDAO {
     private Connection con;
     private PreparedStatement stmt;
     
