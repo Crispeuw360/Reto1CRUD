@@ -30,37 +30,26 @@ public class ImplementsBD implements UserDAO {
     
     
     public ImplementsBD(){
-        this.configFile = ResourceBundle.getBundle("model.configClase");
-        this.driverBD = this.configFile.getString("Driver");
-        this.urlBD = this.configFile.getString("Conn");
-        this.userBD = this.configFile.getString("DBUser");
-        this.passwordBD = this.configFile.getString("DBPass");
+                this.configFile = ResourceBundle.getBundle("model.configClase");
+		this.driverBD = this.configFile.getString("Driver");
+		this.urlBD = this.configFile.getString("Conn");
+		this.userBD = this.configFile.getString("DBUser");
+		this.passwordBD = this.configFile.getString("DBPass");
     }
     
      private void openConnection() {
-        try {
-            con = DriverManager.getConnection(urlBD, this.userBD, this.passwordBD);
-        } catch (SQLException e) {
-            System.out.println("Error al intentar abrir la BD");
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-     private void closeConnection() {
-        try {
-            if (stmt != null && !stmt.isClosed()) {
-                stmt.close();
+            try {
+                con = DriverManager.getConnection(urlBD, this.userBD, this.passwordBD);
+            } catch (SQLException e) {
+                System.out.println("Error al intentar abrir la BD");
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if (con != null && !con.isClosed()) {
-                con.close();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error al cerrar la conexión con la BD");
-            e.printStackTrace();
-        }
-    }
-     public boolean existsUser(String username) {
+        }  
+
+
+    public boolean existUser(String username) {
         boolean exists = false;
 
         try {
@@ -79,9 +68,7 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println("❌ Error al comprobar si el usuario existe");
             e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        } 
 
         return exists;
     }
@@ -124,10 +111,34 @@ public class ImplementsBD implements UserDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        } 
+        
         return inserted;
+    }
+     
+    public boolean validatePassword(String username, String password) {
+        boolean valid = false;
+        try {
+            openConnection();
+            String sql = "SELECT passwd FROM Profile_ WHERE user_name = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String storedPass = rs.getString("passwd");
+                if (storedPass.equals(password)) {
+                    valid = true;
+                }
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al validar contraseña");
+            e.printStackTrace();
+        } 
+        return valid;
     }
 
      

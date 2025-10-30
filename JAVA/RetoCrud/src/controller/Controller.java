@@ -20,8 +20,11 @@ public class Controller {
     public boolean insertUser(User_ user){
         return userDAO.insertUser(user);
     }
-    public boolean existsUser(String username){
-        return userDAO.existsUser(username);
+    public boolean existUser(String username){
+        return userDAO.existUser(username);
+    }
+    public boolean validatePassword(String username, String password){
+        return userDAO.validatePassword(username, password);
     }
       
 }

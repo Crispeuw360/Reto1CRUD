@@ -6,15 +6,20 @@
 package view;
 
 import controller.Controller;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import model.ImplementsBD;
 import model.User_;
 
@@ -160,7 +165,7 @@ public class SignUpController implements Initializable {
                 comboGender.getValue()
         );
         boolean exists=false;
-        if (con.existsUser(fieldUser.getText())){
+        if (con.existUser(fieldUser.getText())){
             System.out.println("Usuario ya existente");
             showError("Usuario ya existente");
         }
@@ -175,7 +180,33 @@ public class SignUpController implements Initializable {
         }
     }
     }
-    
+   
+    @FXML
+    private void onBack(){
+        System.out.println("Back");
+        try {
+            // Cargar el FXML de la ventana de registro
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginWindow.fxml"));
+            Parent root = loader.load();
+
+            // Crear nueva escena y ventana (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("LogIn");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+
+            // Mostrar la nueva ventana
+            stage.show();
+
+            // Cerrar la actual (opcional)
+            Stage currentStage = (Stage) btnBack.getScene().getWindow();
+            currentStage.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("No se pudo abrir la ventana de registro.");
+        }
+    }
     private void showError(String mensaje) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
         alert.setTitle("Error");

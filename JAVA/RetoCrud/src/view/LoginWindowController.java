@@ -5,25 +5,30 @@
  */
 package view;
 
+import controller.Controller;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import controller.Controller;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
  *
- * @author 2dami
+ * @author pablo
  */
 public class LoginWindowController implements Initializable {
-    private Controller controller;
 
     @FXML
     private AnchorPane backgroundPanel;
@@ -46,14 +51,90 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Label msgLabel;
 
+    
+    private Controller con = new Controller();
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        controller = new Controller();
-    }    
+        // Deshabilitar el botón hasta que ambos campos estén rellenos
+        loginBtn.setDisable(true);
 
+        usernameField.textProperty().addListener((obs, oldV, newV) -> checkFields());
+        passwordField.textProperty().addListener((obs, oldV, newV) -> checkFields());
+    }
+
+    private void checkFields() {
+        boolean filled = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
+        loginBtn.setDisable(!filled);
+    } 
+
+    @FXML
+    private void onLogin() {
+        System.out.println("dices ");
+        String username= usernameField.getText();
+        boolean existe = con.existUser(username);
+        if (!existe){
+            showError("No existe el usuario");
+                    
+        }
+        else{
+            String password= passwordField.getText();
+            boolean valido = con.validatePassword(username, password);
+            if (valido){
+                showSuccess("USUARIO ENCONTRADO");
+                clearFields();
+            }
+            else{
+                showSuccess("USUARIO NO ENCONTRADO");
+                clearFields();
+            }
+        }
+    }
+    @FXML
+    private void onSignUp() {
+        try {
+            // Cargar el FXML de la ventana de registro
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SignUp.fxml"));
+            Parent root = loader.load();
+
+            // Crear nueva escena y ventana (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("Registro de usuario");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+
+            // Mostrar la nueva ventana
+            stage.show();
+
+            // Cerrar la actual (opcional)
+            Stage currentStage = (Stage) signupBtn.getScene().getWindow();
+            currentStage.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("No se pudo abrir la ventana de registro.");
+        }
+    }
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Login correcto");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+    private void clearFields(){
+        usernameField.setText("");
+        passwordField.setText("");
+    }
+    
 }
-    
-    

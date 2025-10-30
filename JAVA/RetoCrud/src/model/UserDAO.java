@@ -10,7 +10,9 @@ package model;
  * @author 2dami
  */
 public interface UserDAO {
-    public boolean existsUser(String username);
+    public boolean existUser(String username);
     
     public boolean insertUser(User_ user);
+    
+    public boolean validatePassword(String username, String password);
 }
