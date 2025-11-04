@@ -26,5 +26,11 @@ public class Controller {
     public boolean validatePassword(String username, String password){
         return userDAO.validatePassword(username, password);
     }
+    public User_ getUserByUsername (String username){
+        return userDAO.getUserByUsername(username);
+    }
+    public boolean updateUser (User_ user){
+        return userDAO.updateUser(user);
+    }
       
 }

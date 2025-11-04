@@ -15,4 +15,8 @@ public interface UserDAO {
     public boolean insertUser(User_ user);
     
     public boolean validatePassword(String username, String password);
+    
+    public User_ getUserByUsername(String username);
+    
+    public boolean updateUser(User_ user);
 }

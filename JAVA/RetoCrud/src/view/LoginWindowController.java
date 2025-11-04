@@ -22,6 +22,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.User_;
 
 /**
  * FXML Controller class
@@ -72,7 +73,6 @@ public class LoginWindowController implements Initializable {
 
     @FXML
     private void onLogin() {
-        System.out.println("dices ");
         String username= usernameField.getText();
         boolean existe = con.existUser(username);
         if (!existe){
@@ -84,6 +84,37 @@ public class LoginWindowController implements Initializable {
             boolean valido = con.validatePassword(username, password);
             if (valido){
                 showSuccess("USUARIO ENCONTRADO");
+                System.out.println("encontrado");
+                User_ user = new User_();
+                user = con.getUserByUsername(usernameField.getText());
+                System.out.println(user.getName_()+ " "+user.getEmail());
+                try {
+                    // Cargar el FXML de la ventana de registro
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+                    Parent root = loader.load();
+
+                    // 🔹 Obtener el controlador del FXML
+                    ModifyWindowController modifyController = loader.getController();
+
+                    //🔹 Pasarle el usuario logueado
+                    modifyController.setUser(user);
+                    // Crear nueva escena y ventana (Stage)
+                    Stage stage = new Stage();
+                    stage.setTitle("Modificar");
+                    stage.setScene(new Scene(root));
+                    stage.setResizable(false);
+
+                    // Mostrar la nueva ventana
+                    stage.show();
+
+                    // Cerrar la actual (opcional)
+                    Stage currentStage = (Stage) signupBtn.getScene().getWindow();
+                    currentStage.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    showError("No se pudo abrir la ventana de registro.");
+                }
                 clearFields();
             }
             else{
