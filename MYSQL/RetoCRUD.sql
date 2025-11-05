@@ -9,7 +9,7 @@ CREATE TABLE Profile_(
     email VARCHAR(40),
     name_ VARCHAR(20),
     Surname VARCHAR(20),
-    Telephone INT
+    Telephone BIGINT
 );
 
 CREATE TABLE User_(
