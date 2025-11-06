@@ -22,6 +22,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.User_;
 
@@ -79,6 +80,8 @@ public class ModifyWindowController implements Initializable {
     
     private Controller con = new Controller();
     private User_ currentUser;
+    @FXML
+    private AnchorPane comboUsers;
 
     /**
      * Initializes the controller class.
@@ -101,7 +104,7 @@ public class ModifyWindowController implements Initializable {
         fieldName.setText(user.getName_());
         fieldGmail.setText(user.getEmail());
         fieldSurname.setText(user.getSurname());
-        fieldName.setText(user.getUser_name());
+        fieldUser.setText(user.getUser_name());
         fieldTel.setText(String.valueOf(user.getTelephone()));
         fieldCard.setText(String.valueOf(user.getCard_no()));
         fieldPass.setText(user.getPasswd());
@@ -109,6 +112,7 @@ public class ModifyWindowController implements Initializable {
         fieldUser.setText(user.getUser_name());
         comboGender.setValue(user.getGender());
         btnSave.setDisable(true);
+        fieldUser.setEditable(false);
         setEditableFields(false);
         
     }
@@ -221,7 +225,6 @@ public class ModifyWindowController implements Initializable {
         fieldName.setEditable(editable);
         fieldGmail.setEditable(editable);
         fieldSurname.setEditable(editable);
-        fieldUser.setEditable(editable);
         fieldTel.setEditable(editable);
         fieldCard.setEditable(editable);
         comboGender.setDisable(!editable); // 👈 este es el truco

@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -66,7 +68,7 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al comprobar si el usuario existe");
+            System.out.println(" Error al comprobar si el usuario existe");
             e.printStackTrace();
         } 
 
@@ -214,6 +216,91 @@ public class ImplementsBD implements UserDAO {
 
         return updated;
     }
+    
+    public Map<String, User_> getAllUsers() {
+        Map<String, User_> usersMap = new HashMap<>();
+
+        try {
+            openConnection();
+
+            // Consulta conjunta Profile_ + User_
+            String sql = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
+                       + "u.card_no, u.gender "
+                       + "FROM Profile_ p "
+                       + "INNER JOIN User_ u ON p.user_code = u.Profile_code";
+
+            stmt = con.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            // Recorremos resultados y los metemos en el mapa
+            while (rs.next()) {
+                User_ user = new User_();
+                user.setUser_code(rs.getInt("user_code"));
+                user.setUser_name(rs.getString("user_name"));
+                user.setPasswd(rs.getString("passwd"));
+                user.setEmail(rs.getString("email"));
+                user.setName_(rs.getString("name_"));
+                user.setSurname(rs.getString("Surname"));
+                user.setTelephone(rs.getInt("Telephone"));
+                user.setCard_no(rs.getInt("card_no"));
+                user.setGender(rs.getString("gender"));
+
+                // Añadir al HashMap
+                usersMap.put(user.getUser_name(), user);
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al obtener todos los usuarios");
+            e.printStackTrace();
+        }
+
+        return usersMap;
+    }
+    public boolean isAdmin(String username) {
+        boolean admin = false;
+
+        try {
+            openConnection();
+
+            // 🔹 Obtener el ID del usuario en Profile_
+            String sql = "SELECT user_code FROM Profile_ WHERE user_name = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            int userCode = -1;
+            if (rs.next()) {
+                userCode = rs.getInt("user_code");
+            }
+            rs.close();
+            stmt.close();
+
+            // 🔹 Si existe, mirar si aparece en la tabla Admin_
+            if (userCode != -1) {
+                String sql2 = "SELECT COUNT(*) FROM Admin_ WHERE Profile_code = ?";
+                stmt = con.prepareStatement(sql2);
+                stmt.setInt(1, userCode);
+                ResultSet rs2 = stmt.executeQuery();
+
+                if (rs2.next() && rs2.getInt(1) > 0) {
+                    admin = true;
+                }
+
+                rs2.close();
+                stmt.close();
+            }
+
+        } catch (SQLException e) {
+            System.out.println("❌ Error comprobando si el usuario es administrador");
+            e.printStackTrace();
+        }
+
+        return admin;
+    }
+
+
 
 
 

@@ -5,6 +5,8 @@
  */
 package model;
 
+import java.util.Map;
+
 /**
  *
  * @author 2dami
@@ -19,4 +21,8 @@ public interface UserDAO {
     public User_ getUserByUsername(String username);
     
     public boolean updateUser(User_ user);
+    
+    public Map getAllUsers();
+    
+    public boolean isAdmin(String username);
 }

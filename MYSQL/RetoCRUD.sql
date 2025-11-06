@@ -36,6 +36,14 @@ INSERT INTO User_ (Profile_code,card_no, gender) VALUES
 -- Inserts para la tabla Admin_ (usando nuevos user_code)
 INSERT INTO Profile_ (user_name, passwd, email, name_, Surname, Telephone) VALUES
 ('admin1', 'adminpass1', 'admin1@empresa.com', 'Ana', 'Rodríguez', 111222333);
-
 INSERT INTO Admin_ (Profile_code,Current_account) VALUES
 (3, 'ES9121000418450200051332');
+use RetoCRUD;
+SELECT * FROM Profile_;
+
+USE RetoCRUD;
+SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone,
+       u.card_no, u.gender
+FROM Profile_ p
+INNER JOIN User_ u ON p.user_code = u.Profile_code
+WHERE p.user_name = 'juan_perez';
