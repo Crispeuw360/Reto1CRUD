@@ -117,7 +117,7 @@ public class ModifyWindowController implements Initializable {
     private void onBack(ActionEvent event) {
         try {
             // Cargar el FXML de la ventana de login
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
             Parent root = loader.load();
 
             // Crear la escena y ventana (Stage)

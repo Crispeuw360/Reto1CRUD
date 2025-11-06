@@ -35,7 +35,7 @@ public class ImplementsBD implements UserDAO {
         }
     }
 
-    public boolean existUser(String username) {
+    public synchronized boolean existUser(String username) {
         boolean exists = false;
 
         try {
@@ -61,7 +61,7 @@ public class ImplementsBD implements UserDAO {
         return exists;
     }
 
-    public boolean insertUser(User_ user) {
+    public synchronized boolean insertUser(User_ user) {
         boolean inserted = false;
         try {
             openConnection();
@@ -105,7 +105,7 @@ public class ImplementsBD implements UserDAO {
         return inserted;
     }
 
-    public boolean validatePassword(String username, String password) {
+    public synchronized boolean validatePassword(String username, String password) {
         boolean valid = false;
         try {
             openConnection();
@@ -132,7 +132,7 @@ public class ImplementsBD implements UserDAO {
         return valid;
     }
 
-    public User_ getUserByUsername(String username) {
+    public synchronized User_ getUserByUsername(String username) {
         User_ user = null;
 
         try {
@@ -174,7 +174,7 @@ public class ImplementsBD implements UserDAO {
         return user;
     }
 
-    public boolean updateUser(User_ user) {
+    public synchronized boolean  updateUser(User_ user) {
         boolean updated = false;
 
         try {
