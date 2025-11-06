@@ -17,6 +17,20 @@ public class Controller {
     public Controller() {
         this.userDAO = new ImplementsBD();
     }
-    
-    
+    public boolean insertUser(User_ user){
+        return userDAO.insertUser(user);
+    }
+    public boolean existUser(String username){
+        return userDAO.existUser(username);
+    }
+    public boolean validatePassword(String username, String password){
+        return userDAO.validatePassword(username, password);
+    }
+    public User_ getUserByUsername (String username){
+        return userDAO.getUserByUsername(username);
+    }
+    public boolean updateUser (User_ user){
+        return userDAO.updateUser(user);
+    }
+      
 }

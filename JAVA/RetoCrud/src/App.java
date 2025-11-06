@@ -10,10 +10,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SignUp.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginWindow.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
-        stage.setTitle("Sign Up");
+        stage.setTitle("Log In");
         stage.setScene(scene);
         stage.show();
     }

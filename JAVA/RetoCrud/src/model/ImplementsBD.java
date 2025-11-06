@@ -30,37 +30,26 @@ public class ImplementsBD implements UserDAO {
     
     
     public ImplementsBD(){
-        this.configFile = ResourceBundle.getBundle("model.configClase");
-        this.driverBD = this.configFile.getString("Driver");
-        this.urlBD = this.configFile.getString("Conn");
-        this.userBD = this.configFile.getString("DBUser");
-        this.passwordBD = this.configFile.getString("DBPass");
+                this.configFile = ResourceBundle.getBundle("model.configClase");
+		this.driverBD = this.configFile.getString("Driver");
+		this.urlBD = this.configFile.getString("Conn");
+		this.userBD = this.configFile.getString("DBUser");
+		this.passwordBD = this.configFile.getString("DBPass");
     }
     
      private void openConnection() {
-        try {
-            con = DriverManager.getConnection(urlBD, this.userBD, this.passwordBD);
-        } catch (SQLException e) {
-            System.out.println("Error al intentar abrir la BD");
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-     private void closeConnection() {
-        try {
-            if (stmt != null && !stmt.isClosed()) {
-                stmt.close();
+            try {
+                con = DriverManager.getConnection(urlBD, this.userBD, this.passwordBD);
+            } catch (SQLException e) {
+                System.out.println("Error al intentar abrir la BD");
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if (con != null && !con.isClosed()) {
-                con.close();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error al cerrar la conexión con la BD");
-            e.printStackTrace();
-        }
-    }
-     public boolean existsUsername(String username) {
+        }  
+
+
+    public boolean existUser(String username) {
         boolean exists = false;
 
         try {
@@ -79,9 +68,7 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println("❌ Error al comprobar si el usuario existe");
             e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        } 
 
         return exists;
     }
@@ -124,11 +111,111 @@ public class ImplementsBD implements UserDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        } 
+        
         return inserted;
     }
+     
+    public boolean validatePassword(String username, String password) {
+        boolean valid = false;
+        try {
+            openConnection();
+            String sql = "SELECT passwd FROM Profile_ WHERE user_name = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String storedPass = rs.getString("passwd");
+                if (storedPass.equals(password)) {
+                    valid = true;
+                }
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al validar contraseña");
+            e.printStackTrace();
+        } 
+        return valid;
+    }
+    public User_ getUserByUsername(String username) {
+        User_ user = null;
+
+        try {
+            openConnection();
+
+            //Unir las dos tablas por Profile_code / user_code
+            String sql = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
+                       + "u.card_no, u.gender "
+                       + "FROM Profile_ p "
+                       + "INNER JOIN User_ u ON p.user_code = u.Profile_code "
+                       + "WHERE p.user_name = ?";
+
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                user = new User_();
+                user.setUser_code(rs.getInt("user_code"));
+                user.setUser_name(rs.getString("user_name"));
+                user.setPasswd(rs.getString("passwd"));
+                user.setEmail(rs.getString("email"));
+                user.setName_(rs.getString("name_"));
+                user.setSurname(rs.getString("Surname"));
+                user.setTelephone(rs.getInt("Telephone"));
+                user.setCard_no(rs.getInt("card_no"));
+                user.setGender(rs.getString("gender"));
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al obtener el usuario completo por nombre");
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+    public boolean updateUser(User_ user) {
+        boolean updated = false;
+
+        try {
+            openConnection();
+
+            // ctualizamos la tabla Profile_
+            String sqlProfile = "UPDATE Profile_ SET user_name=?, passwd=?, email=?, name_=?, Surname=?, Telephone=? WHERE user_code=?";
+            stmt = con.prepareStatement(sqlProfile);
+            stmt.setString(1, user.getUser_name());
+            stmt.setString(2, user.getPasswd());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getName_());
+            stmt.setString(5, user.getSurname());
+            stmt.setInt(6, user.getTelephone());
+            stmt.setInt(7, user.getUser_code());
+            stmt.executeUpdate();
+            stmt.close();
+
+            // Actualizamos la tabla User_
+            String sqlUser = "UPDATE User_ SET card_no=?, gender=? WHERE Profile_code=?";
+            stmt = con.prepareStatement(sqlUser);
+            stmt.setInt(1, user.getCard_no());
+            stmt.setString(2, user.getGender());
+            stmt.setInt(3, user.getUser_code());
+            updated = stmt.executeUpdate() > 0;
+
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al actualizar el usuario");
+            e.printStackTrace();
+        }
+
+        return updated;
+    }
+
+
 
      
 }
