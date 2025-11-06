@@ -90,7 +90,7 @@ public class LoginWindowController implements Initializable {
                 System.out.println(user.getName_()+ " "+user.getEmail());
                 try {
                     // Cargar el FXML de la ventana de registro
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
                     Parent root = loader.load();
 
                     // 🔹 Obtener el controlador del FXML
@@ -127,7 +127,7 @@ public class LoginWindowController implements Initializable {
     private void onSignUp() {
         try {
             // Cargar el FXML de la ventana de registro
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SignUp.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SignUp.fxml"));
             Parent root = loader.load();
 
             // Crear nueva escena y ventana (Stage)

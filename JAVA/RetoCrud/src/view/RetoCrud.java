@@ -19,7 +19,7 @@ public class RetoCrud extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/LoginWindow.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("LoginWindow.fxml"));
         
         Scene scene = new Scene(root);
         
