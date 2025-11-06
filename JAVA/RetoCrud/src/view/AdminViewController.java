@@ -51,6 +51,8 @@ public class AdminViewController implements Initializable {
     private Label passLabel;
     @FXML
     private Button back;
+    
+    
 
     /**
      * Initializes the controller class.
@@ -58,6 +60,7 @@ public class AdminViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        
     }    
     
 }
