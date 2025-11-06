@@ -10,11 +10,9 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane id="AnchorPane" prefHeight="514.0" prefWidth="721.0" style="-fx-background-color: #94B4C1;" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignUpController">
-    <stylesheets>
-        <URL value="@signup.css" />
-    </stylesheets>
+   
    <children>
-      <Button id="btnBack" fx:id="btnBack" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Back" textFill="WHITE">
+      <Button id="btnBack" fx:id="btnBack" layoutX="14.0" layoutY="14.0" onAction="#onBack" mnemonicParsing="false" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Back" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font></Button>
