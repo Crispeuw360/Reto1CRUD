@@ -25,4 +25,6 @@ public interface UserDAO {
     public Map getAllUsers();
     
     public boolean isAdmin(String username);
+
+    public boolean deleteUser(String username);
 }

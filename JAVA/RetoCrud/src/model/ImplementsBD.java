@@ -23,6 +23,27 @@ public class ImplementsBD implements UserDAO {
     private Connection con;
     private PreparedStatement stmt;
 
+    //All sql 
+    private final String sqlProfile = "INSERT INTO Profile_ (user_name, passwd, email, name_, Surname, Telephone) VALUES (?,?,?,?,?,?)";
+    private final String sqlUser = "INSERT INTO User_ (Profile_code, card_no, gender) VALUES (?,?,?)";
+    private final String sqlExistUser = "SELECT COUNT(*) FROM Profile_ WHERE user_name = ?";
+    private final String sqlValidatePassword = "SELECT passwd FROM Profile_ WHERE user_name = ?";
+    private final String sqlGetUserByUsername = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
+            + "u.card_no, u.gender "
+            + "FROM Profile_ p "
+            + "INNER JOIN User_ u ON p.user_code = u.Profile_code "
+            + "WHERE p.user_name = ?";
+    private final String sqlAdmin = "SELECT COUNT(*) FROM Profile_ WHERE user_name = ? AND passwd = ?";
+    private final String sqlUpdateUser = " UPDATE User_ SET card_no=?, gender=? WHERE Profile_code=?";
+    private final String sqlUpdateProfile = "UPDATE Profile_ SET passwd = ?, email = ?, name_ = ?, Surname = ?, Telephone = ? WHERE user_name = ?";
+    private final String sqlDeleteProfile = "DELETE FROM Profile_ WHERE user_name = ? ";
+    private final String sqlDeleteUser = "DELETE FROM User_ WHERE Profile_code = ?";
+    private final String sqlListUsers = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
+            + "u.card_no, u.gender "
+            + "FROM Profile_ p "
+            + "INNER JOIN User_ u ON p.user_code = u.Profile_code";
+
+
     public ImplementsBD() {
         // No necesitamos cargar configuración desde properties
         // porque el pool ya tiene la configuración hardcodeada
@@ -98,8 +119,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
                 return false; // ❌ NO mostrar error, solo retornar false silenciosamente
             }
 
-            String sql = "SELECT COUNT(*) FROM Profile_ WHERE user_name = ?";
-            stmt = con.prepareStatement(sql);
+            stmt = con.prepareStatement(sqlExistUser);
             stmt.setString(1, username);
 
             ResultSet rs = stmt.executeQuery();
@@ -130,7 +150,6 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             openConnection();
 
             // Paso 1: Insertar en Profile_
-            String sqlProfile = "INSERT INTO Profile_ (user_name, passwd, email, name_, Surname, Telephone) VALUES (?,?,?,?,?,?)";
             stmt = con.prepareStatement(sqlProfile, PreparedStatement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getUser_name());
             stmt.setString(2, user.getPasswd());
@@ -150,7 +169,6 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             stmt.close();
 
             // Paso 2: Insertar en User_
-            String sqlUser = "INSERT INTO User_ (Profile_code, card_no, gender) VALUES (?,?,?)";
             stmt = con.prepareStatement(sqlUser);
             stmt.setInt(1, profileCode);
             stmt.setInt(2, user.getCard_no());
@@ -168,6 +186,34 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
         return inserted;
     }
 
+    public boolean deleteUser(String username) {
+        boolean deleted = false;
+
+        try {
+            openConnection();
+            if (con == null) {
+                System.out.println("⏳ No hay conexiones disponibles para eliminar usuario");
+                return false; // ❌ Sin error en rojo
+            }
+
+            stmt = con.prepareStatement(sqlDeleteProfile);
+            stmt.setString(1, username);
+            deleted = stmt.executeUpdate() > 0;
+            stmt.close();
+            stmt = con.prepareStatement(sqlDeleteUser);
+            stmt.setString(1, username);
+            deleted = stmt.executeUpdate() > 0;
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Error al eliminar el usuario");
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+
+        return deleted;
+    }
+
     public boolean validatePassword(String username, String password) {
         boolean valid = false;
 
@@ -178,8 +224,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
                 return false; // ❌ Sin error en rojo
             }
 
-            String sql = "SELECT passwd FROM Profile_ WHERE user_name = ?";
-            stmt = con.prepareStatement(sql);
+            stmt = con.prepareStatement(sqlValidatePassword);
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
 
@@ -215,13 +260,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
                 return null; // ❌ Sin error en rojo
             }
 
-            String sql = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
-                    + "u.card_no, u.gender "
-                    + "FROM Profile_ p "
-                    + "INNER JOIN User_ u ON p.user_code = u.Profile_code "
-                    + "WHERE p.user_name = ?";
-
-            stmt = con.prepareStatement(sql);
+            stmt = con.prepareStatement(sqlGetUserByUsername);
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
 
@@ -261,8 +300,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             openConnection();
 
             // Actualizamos la tabla Profile_
-            String sqlProfile = "UPDATE Profile_ SET user_name=?, passwd=?, email=?, name_=?, Surname=?, Telephone=? WHERE user_code=?";
-            stmt = con.prepareStatement(sqlProfile);
+            stmt = con.prepareStatement(sqlUpdateProfile);
             stmt.setString(1, user.getUser_name());
             stmt.setString(2, user.getPasswd());
             stmt.setString(3, user.getEmail());
@@ -274,8 +312,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             stmt.close();
 
             // Actualizamos la tabla User_
-            String sqlUser = "UPDATE User_ SET card_no=?, gender=? WHERE Profile_code=?";
-            stmt = con.prepareStatement(sqlUser);
+            stmt = con.prepareStatement(sqlUpdateUser);
             stmt.setInt(1, user.getCard_no());
             stmt.setString(2, user.getGender());
             stmt.setInt(3, user.getUser_code());
@@ -299,12 +336,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             openConnection();
 
             // Consulta conjunta Profile_ + User_
-            String sql = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
-                       + "u.card_no, u.gender "
-                       + "FROM Profile_ p "
-                       + "INNER JOIN User_ u ON p.user_code = u.Profile_code";
-
-            stmt = con.prepareStatement(sql);
+            stmt = con.prepareStatement(sqlListUsers);
             ResultSet rs = stmt.executeQuery();
 
             // Recorremos resultados y los metemos en el mapa
@@ -340,8 +372,7 @@ public void loginAsync(String username, String password, Stage stage, LoginWindo
             openConnection();
 
             // 🔹 Obtener el ID del usuario en Profile_
-            String sql = "SELECT user_code FROM Profile_ WHERE user_name = ?";
-            stmt = con.prepareStatement(sql);
+            stmt = con.prepareStatement(sqlAdmin);
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
 
