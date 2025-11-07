@@ -117,69 +117,55 @@ public class SignUpController implements Initializable {
    }
    
    @FXML
-    public void onRegister() {
-        boolean datosValidos=false;
-        int tel = 0;
-        int card = 0;
-        String porque="Nada";
-        
-        if (fieldPass.getText().equals(fieldPass2.getText())){
-            datosValidos=true;
-            if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")){
-                datosValidos=false;
-                porque="Gmail";
-                showError("Gmail invalido");
-            }
-            else{
-                datosValidos=true;
-                try {
-                    tel = Integer.parseInt(fieldTel.getText());
-                    card = Integer.parseInt(fieldCard.getText());
-                } catch (NumberFormatException e) {
-                    datosValidos = false;
-                    showError("Telefono o numero de tarjeta no numericos");
-                    porque = "Teléfono o número de tarjeta no válidos (deben ser numéricos)";
-                    
-                }
+public void onRegister() {
+    boolean datosValidos = false;
+    int tel = 0;
+    int card = 0;
+    
+    // Validaciones (igual que antes)
+    if (fieldPass.getText().equals(fieldPass2.getText())) {
+        datosValidos = true;
+        if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            datosValidos = false;
+            showError("Gmail inválido");
+        } else {
+            datosValidos = true;
+            try {
+                tel = Integer.parseInt(fieldTel.getText());
+                card = Integer.parseInt(fieldCard.getText());
+            } catch (NumberFormatException e) {
+                datosValidos = false;
+                showError("Teléfono o número de tarjeta no válidos (deben ser numéricos)");
             }
         }
-        else{
-            datosValidos=false;
-            
-            porque="Pass invalida";
-            showError("Contraseñas no coinciden");
-        }
-        System.out.println("Datos Validos: "+datosValidos);
-        System.out.println(porque);
+    } else {
+        datosValidos = false;
+        showError("Contraseñas no coinciden");
+    }
+    
+    if (datosValidos) {
+        // Deshabilitar el botón para evitar múltiples clics
+        btnRegistro.setDisable(true);
+        btnRegistro.setText("Creando...");
         
-        if (datosValidos) {
-            User_ nuevoUser = new User_(
-                0,
-                fieldUser.getText(),
-                fieldPass.getText(),
-                fieldGmail.getText(),
-                fieldName.getText(),
-                fieldSurname.getText(),
-                tel,
-                card,
-                comboGender.getValue()
+        User_ nuevoUser = new User_(
+            0,
+            fieldUser.getText(),
+            fieldPass.getText(),
+            fieldGmail.getText(),
+            fieldName.getText(),
+            fieldSurname.getText(),
+            tel,
+            card,
+            comboGender.getValue()
         );
-        boolean exists=false;
-        if (con.existUser(fieldUser.getText())){
-            System.out.println("Usuario ya existente");
-            showError("Usuario ya existente");
-        }
-        else{
-          boolean creado = con.insertUser(nuevoUser);
-          
-          if (creado){
-              System.out.println("Creado correctamente");
-              showSuccess("Usuario creado correctamente");
-              clearFields();
-          }
-        }
+        
+        // Usar el método asíncrono que ahora está en ImplementsBD
+        con.insertUserAsync(nuevoUser, (Stage) btnRegistro.getScene().getWindow());
+        
+        System.out.println("Proceso de creación asíncrono iniciado...");
     }
-    }
+}
    
     @FXML
     private void onBack(){

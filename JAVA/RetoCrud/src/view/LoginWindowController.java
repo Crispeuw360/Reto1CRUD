@@ -9,6 +9,8 @@ import controller.Controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -52,8 +54,8 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Label msgLabel;
 
-    
     private Controller con = new Controller();
+
     /**
      * Initializes the controller class.
      */
@@ -69,60 +71,38 @@ public class LoginWindowController implements Initializable {
     private void checkFields() {
         boolean filled = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
         loginBtn.setDisable(!filled);
-    } 
+    }
 
     @FXML
     private void onLogin() {
-        String username= usernameField.getText();
-        boolean existe = con.existUser(username);
-        if (!existe){
-            showError("No existe el usuario");
-                    
-        }
-        else{
-            String password= passwordField.getText();
-            boolean valido = con.validatePassword(username, password);
-            if (valido){
-                showSuccess("USUARIO ENCONTRADO");
-                System.out.println("encontrado");
-                User_ user = new User_();
-                user = con.getUserByUsername(usernameField.getText());
-                System.out.println(user.getName_()+ " "+user.getEmail());
-                try {
-                    // Cargar el FXML de la ventana de registro
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
-                    Parent root = loader.load();
+        String username = usernameField.getText();
+        String password = passwordField.getText();
 
-                    // 🔹 Obtener el controlador del FXML
-                    ModifyWindowController modifyController = loader.getController();
+        setButtonsDisabled(true);
 
-                    //🔹 Pasarle el usuario logueado
-                    modifyController.setUser(user);
-                    // Crear nueva escena y ventana (Stage)
-                    Stage stage = new Stage();
-                    stage.setTitle("Modificar");
-                    stage.setScene(new Scene(root));
-                    stage.setResizable(false);
+        // Pasar 'this' como referencia al controlador
+        con.loginAsync(username, password, (Stage) loginBtn.getScene().getWindow(), this);
 
-                    // Mostrar la nueva ventana
-                    stage.show();
-
-                    // Cerrar la actual (opcional)
-                    Stage currentStage = (Stage) signupBtn.getScene().getWindow();
-                    currentStage.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    showError("No se pudo abrir la ventana de registro.");
-                }
-                clearFields();
-            }
-            else{
-                showSuccess("USUARIO NO ENCONTRADO");
-                clearFields();
-            }
-        }
+        System.out.println("Proceso de login asíncrono iniciado...");
     }
+
+    /**
+     * Habilita o deshabilita los botones durante el proceso de login
+     */
+    private void setButtonsDisabled(boolean disabled) {
+        loginBtn.setDisable(disabled);
+        signupBtn.setDisable(disabled);
+        loginBtn.setText(disabled ? "Iniciando..." : "Iniciar Sesión");
+    }
+
+    /**
+     * Método público para re-habilitar los botones desde fuera
+     */
+    public void enableButtons() {
+        setButtonsDisabled(false);
+        clearFields();
+    }
+
     @FXML
     private void onSignUp() {
         try {
@@ -148,6 +128,7 @@ public class LoginWindowController implements Initializable {
             showError("No se pudo abrir la ventana de registro.");
         }
     }
+
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -163,9 +144,10 @@ public class LoginWindowController implements Initializable {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-    private void clearFields(){
+
+    private void clearFields() {
         usernameField.setText("");
         passwordField.setText("");
     }
-    
+
 }
