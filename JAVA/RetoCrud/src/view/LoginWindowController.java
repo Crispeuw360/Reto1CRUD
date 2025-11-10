@@ -71,7 +71,8 @@ public class LoginWindowController implements Initializable {
         loginBtn.setDisable(!filled);
     } 
 
-    @FXML
+    
+@FXML
     private void onLogin() {
         String username= usernameField.getText();
         boolean existe = con.existUser(username);
@@ -85,35 +86,44 @@ public class LoginWindowController implements Initializable {
             if (valido){
                 showSuccess("USUARIO ENCONTRADO");
                 System.out.println("encontrado");
-                User_ user = new User_();
-                user = con.getUserByUsername(usernameField.getText());
-                System.out.println(user.getName_()+ " "+user.getEmail());
+                boolean isAdmin = con.isAdmin(username);
+                
+                
                 try {
-                    // Cargar el FXML de la ventana de registro
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
-                    Parent root = loader.load();
-
-                    // 🔹 Obtener el controlador del FXML
-                    ModifyWindowController modifyController = loader.getController();
-
-                    //🔹 Pasarle el usuario logueado
-                    modifyController.setUser(user);
-                    // Crear nueva escena y ventana (Stage)
+                    FXMLLoader loader;
+                    Parent root;
                     Stage stage = new Stage();
-                    stage.setTitle("Modificar");
+
+                    if (isAdmin) {
+                        // 🔸 Si es admin, cargar AdminView.fxml
+                        loader = new FXMLLoader(getClass().getResource("/view/AdminView.fxml"));
+                        root = loader.load();
+
+                       
+                        stage.setTitle("Panel de Administración");
+                    } else {
+                        // 🔹 Si es usuario normal, cargar ModifyWindow.fxml
+                        loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+                        root = loader.load();
+
+                        ModifyWindowController modifyController = loader.getController();
+                        User_ user = con.getUserByUsername(usernameField.getText());
+                        modifyController.setUser(user);
+
+                        stage.setTitle("Modificar perfil");
+                    }
+
                     stage.setScene(new Scene(root));
                     stage.setResizable(false);
-
-                    // Mostrar la nueva ventana
                     stage.show();
 
-                    // Cerrar la actual (opcional)
+                    // Cerrar la ventana de login
                     Stage currentStage = (Stage) signupBtn.getScene().getWindow();
                     currentStage.close();
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    showError("No se pudo abrir la ventana de registro.");
+                    showError("No se pudo abrir la ventana correspondiente.");
                 }
                 clearFields();
             }
