@@ -5,12 +5,14 @@
  */
 package model;
 
+import java.util.Map;
+
 /**
  *
  * @author 2dami
  */
 public interface UserDAO {
-    public boolean existUser(String username);
+     public boolean existUser(String username);
     
     public boolean insertUser(User_ user);
     
@@ -19,4 +21,10 @@ public interface UserDAO {
     public User_ getUserByUsername(String username);
     
     public boolean updateUser(User_ user);
+
+    public Map<String, User_> getAllUsers();
+    
+    public boolean isAdmin(String username);
+
+    public boolean deleteUser(String username);
 }

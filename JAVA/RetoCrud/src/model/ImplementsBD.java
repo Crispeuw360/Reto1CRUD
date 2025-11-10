@@ -268,13 +268,12 @@ public class ImplementsBD implements UserDAO {
 
             // Actualizamos la tabla Profile_
             stmt = con.prepareStatement(sqlUpdateProfile);
-            stmt.setString(1, user.getUser_name());
-            stmt.setString(2, user.getPasswd());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getName_());
-            stmt.setString(5, user.getSurname());
-            stmt.setInt(6, user.getTelephone());
-            stmt.setInt(7, user.getUser_code());
+            stmt.setString(1, user.getPasswd());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getName_());
+            stmt.setString(4, user.getSurname());
+            stmt.setInt(5, user.getTelephone());
+            stmt.setString(6, user.getUser_name());
             stmt.executeUpdate();
             stmt.close();
 

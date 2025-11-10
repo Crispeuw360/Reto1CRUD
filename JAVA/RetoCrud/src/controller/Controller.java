@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package controller;
+import java.util.Map;
+
 import model.*;
 
 /**
@@ -31,6 +33,15 @@ public class Controller {
     }
     public boolean updateUser (User_ user){
         return userDAO.updateUser(user);
+    }
+    public Map<String, User_> getAllUsers(){
+        return userDAO.getAllUsers();
+    }
+    public boolean isAdmin(String username){
+        return userDAO.isAdmin(username);
+    }
+    public boolean deleteUser(String username){
+        return userDAO.deleteUser(username);
     }
       
 }
