@@ -17,6 +17,7 @@ import java.sql.SQLException;
 public class ImplementsBD implements UserDAO {
     private Connection con;
     private PreparedStatement stmt;
+    private ThreadConexion threadConexion;
 
     public ImplementsBD() {
         // No necesitamos cargar configuración desde properties
@@ -63,6 +64,8 @@ public class ImplementsBD implements UserDAO {
 
     public synchronized boolean insertUser(User_ user) {
         boolean inserted = false;
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
         try {
             openConnection();
 
@@ -176,6 +179,8 @@ public class ImplementsBD implements UserDAO {
 
     public synchronized boolean  updateUser(User_ user) {
         boolean updated = false;
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
 
         try {
             openConnection();
