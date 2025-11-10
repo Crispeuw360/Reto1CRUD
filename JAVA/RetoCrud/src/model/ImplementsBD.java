@@ -22,6 +22,7 @@ import view.LoginWindowController;
 public class ImplementsBD implements UserDAO {
     private Connection con;
     private PreparedStatement stmt;
+    private ThreadConexion threadConexion;
 
     //All sql 
     private final String sqlProfile = "INSERT INTO Profile_ (user_name, passwd, email, name_, Surname, Telephone) VALUES (?,?,?,?,?,?)";
@@ -106,6 +107,8 @@ public class ImplementsBD implements UserDAO {
 
     public boolean insertUser(User_ user) {
         boolean inserted = false;
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
         try {
             openConnection();
 
@@ -148,6 +151,8 @@ public class ImplementsBD implements UserDAO {
 
     public boolean deleteUser(String username) {
         boolean deleted = false;
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
 
         try {
             openConnection();
@@ -255,6 +260,8 @@ public class ImplementsBD implements UserDAO {
 
     public boolean updateUser(User_ user) {
         boolean updated = false;
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
 
         try {
             openConnection();
@@ -291,6 +298,8 @@ public class ImplementsBD implements UserDAO {
 
      public Map<String, User_> getAllUsers() {
         Map<String, User_> usersMap = new HashMap<>();
+        threadConexion = new ThreadConexion(con);
+        threadConexion.start();
 
         try {
             openConnection();
