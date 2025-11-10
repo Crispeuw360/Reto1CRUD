@@ -5,13 +5,30 @@ import java.sql.SQLException;
 
 import javafx.scene.control.Alert;
 
+/**
+ * Clase que representa un hilo de ejecución para liberar una conexión.
+ * Hereda de la clase {@link Thread} y se encarga de liberar una conexión
+ * después de un cierto tiempo de espera.
+ * 
+ * @author pikain
+ */
 public class ThreadConexion extends Thread {
     private Connection conexion;
 
+    /**
+     * Constructor de la clase ThreadConexion.
+     * 
+     * @param conexion Conexión a liberar.
+     */
     public ThreadConexion(Connection conexion) {
         this.conexion = conexion;
     }
     
+    /**
+     * Método que se ejecuta cuando se inicia el hilo.
+     * 
+     * @throws InterruptedException Si se interrumpe el hilo.
+     */
     @Override
     public void run() {
         try {

@@ -14,7 +14,9 @@ import java.util.Map;
 
 /**
  *
- * @author pablo
+ * @author PIKAIN
+ * @version 1.0
+ * 
  */
 public class ImplementsBD implements UserDAO {
     private Connection con;
@@ -45,6 +47,11 @@ public class ImplementsBD implements UserDAO {
     public ImplementsBD() {
     }
 
+    /**
+     * Abre una conexión con la base de datos.
+     * @param ConexionPoolDBCP
+     * @throws SQLException Si ocurre un error al abrir la conexión.
+     */
     private void openConnection() {
         try {
             // ✅ INTENTAR OBTENER CONEXIÓN
@@ -67,6 +74,12 @@ public class ImplementsBD implements UserDAO {
         }
     }
 
+    /**
+     * Verifica si existe un usuario con el nombre de usuario proporcionado.
+     * 
+     * @param username Nombre de usuario a verificar.
+     * @return true si el usuario existe, false en caso contrario.
+     */
     public boolean existUser(String username) {
         boolean exists = false;
 
@@ -102,6 +115,12 @@ public class ImplementsBD implements UserDAO {
         return exists;
     }
 
+    /**
+     * Inserta un nuevo usuario en la base de datos.
+     * 
+     * @param user Objeto {@link User_} que contiene los datos del usuario a insertar.
+     * @return true si la inserción es exitosa, false en caso contrario.
+     */
     public boolean insertUser(User_ user) {
         boolean inserted = false;
         threadConexion = new ThreadConexion(con);
@@ -146,6 +165,13 @@ public class ImplementsBD implements UserDAO {
         return inserted;
     }
 
+    /**
+     * Elimina un usuario de la base de datos.
+     * 
+     * @param username Nombre de usuario del usuario a eliminar.
+     * @param profile_code Código del perfil del usuario a eliminar.
+     * @return true si la eliminación es exitosa, false en caso contrario.
+     */
     public boolean deleteUser(String username,int profile_code) {
         boolean deleted = false;
         threadConexion = new ThreadConexion(con);
@@ -172,6 +198,13 @@ public class ImplementsBD implements UserDAO {
         return deleted;
     }
 
+    /**
+     * Valida la contraseña de un usuario.
+     * 
+     * @param username Nombre de usuario para validar.
+     * @param password Contraseña a validar.
+     * @return true si la contraseña es correcta, false en caso contrario.
+     */
     public boolean validatePassword(String username, String password) {
         boolean valid = false;
 
@@ -208,6 +241,12 @@ public class ImplementsBD implements UserDAO {
         return valid;
     }
 
+    /**
+     * Obtiene un usuario por su nombre de usuario.
+     * 
+     * @param username Nombre de usuario del usuario a obtener.
+     * @return Objeto {@link User_} que contiene los datos del usuario, o null si no se encuentra.
+     */
     public User_ getUserByUsername(String username) {
         User_ user = null;
 
@@ -250,7 +289,13 @@ public class ImplementsBD implements UserDAO {
 
         return user;
     }
-
+    
+    /**
+     * Actualiza los datos de un usuario en la base de datos.
+     * 
+     * @param user Objeto {@link User_} que contiene los datos del usuario a actualizar.
+     * @return true si la actualización es exitosa, false en caso contrario.
+     */
     public boolean updateUser(User_ user) {
         boolean updated = false;
         threadConexion = new ThreadConexion(con);
@@ -288,7 +333,12 @@ public class ImplementsBD implements UserDAO {
         return updated;
     }
 
-     public Map<String, User_> getAllUsers() {
+    /**
+     * Obtiene todos los usuarios almacenados en la base de datos.
+     * 
+     * @return Mapa que contiene los usuarios, donde la clave es el nombre de usuario y el valor es el objeto {@link User_}.
+     */
+    public Map<String, User_> getAllUsers() {
         Map<String, User_> usersMap = new HashMap<>();
         threadConexion = new ThreadConexion(con);
         threadConexion.start();
@@ -326,6 +376,13 @@ public class ImplementsBD implements UserDAO {
 
         return usersMap;
     }
+    
+    /**
+     * Verifica si un usuario es administrador.
+     * 
+     * @param username Nombre de usuario del usuario a verificar.
+     * @return true si el usuario es administrador, false en caso contrario.
+     */
     public boolean isAdmin(String username) {
         boolean admin = false;
 
@@ -366,7 +423,9 @@ public class ImplementsBD implements UserDAO {
         return admin;
     }
 
-    // Método para cerrar la conexión
+    /**
+     * Método para cerrar la conexión.
+     */
     private void closeConnection() {
         try {
             if (con != null) {

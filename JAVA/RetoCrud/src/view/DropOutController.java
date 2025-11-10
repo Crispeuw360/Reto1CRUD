@@ -29,7 +29,7 @@ import model.User_;
 /**
  * FXML Controller class
  *
- * @author 2dami
+ * @author PIKAIN
  */
 public class DropOutController implements Initializable {
 
@@ -59,16 +59,27 @@ public class DropOutController implements Initializable {
 
     /**
      * Initializes the controller class.
+     * 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
 
+    /**
+     * Establece el nombre de usuario en el campo de texto.
+     * 
+     * @param username Nombre de usuario a establecer.
+     */
     public void setUsername(String username) {
         this.usernameField.setText(username);
     }
 
+    /**
+     * Maneja el evento de eliminar un usuario.
+     * 
+     * @param event Evento de acción.
+     */
     @FXML
     private void onDelete(ActionEvent event) {
         User_ user = con.getUserByUsername(usernameField.getText());
@@ -107,6 +118,11 @@ public class DropOutController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento de volver a la ventana de modificación.
+     * 
+     * @param event Evento de acción.
+     */
     @FXML
     private void OnBack(ActionEvent event) {
         try {
@@ -139,6 +155,12 @@ public class DropOutController implements Initializable {
         }
     }
 
+    /**
+     * Muestra una alerta con el mensaje y el tipo especificados.
+     * 
+     * @param msg  Mensaje a mostrar en la alerta.
+     * @param type Tipo de alerta (INFORMATION, ERROR, etc.).
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
