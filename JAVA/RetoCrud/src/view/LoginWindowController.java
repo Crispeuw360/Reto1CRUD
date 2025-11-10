@@ -85,12 +85,8 @@ public class LoginWindowController implements Initializable {
         loginBtn.setDisable(!filled);
     } 
 
-    /**
-     * Maneja el evento de inicio de sesión.
-     * Valida las credenciales del usuario y redirige a la vista correspondiente
-     * según su tipo (administrador o usuario normal).
-     */
-    @FXML
+    
+@FXML
     private void onLogin() {
         String username = usernameField.getText();
         boolean existe = con.existUser(username);
@@ -114,14 +110,14 @@ public class LoginWindowController implements Initializable {
 
                     if (isAdmin) {
                         // 🔸 Si es admin, cargar AdminView.fxml
-                        loader = new FXMLLoader(getClass().getResource("/view/AdminView.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("AdminView.fxml"));
                         root = loader.load();
 
                        
                         stage.setTitle("Panel de Administración");
                     } else {
                         // 🔹 Si es usuario normal, cargar ModifyWindow.fxml
-                        loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
                         root = loader.load();
 
                         ModifyWindowController modifyController = loader.getController();
@@ -140,7 +136,6 @@ public class LoginWindowController implements Initializable {
                     currentStage.close();
 
                 } catch (IOException e) {
-                    e.printStackTrace();
                     showError("No se pudo abrir la ventana correspondiente.");
                 }
                 clearFields();
@@ -160,7 +155,7 @@ public class LoginWindowController implements Initializable {
     private void onSignUp() {
         try {
             // Cargar el FXML de la ventana de registro
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SignUp.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SignUp.fxml"));
             Parent root = loader.load();
 
             // Crear nueva escena y ventana (Stage)

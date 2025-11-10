@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS RetoCRUD;
 CREATE DATABASE RetoCRUD;
 USE RetoCRUD;
 
+
 CREATE TABLE Profile_(
     user_code INT AUTO_INCREMENT PRIMARY KEY,
     user_name VARCHAR(30) unique NOT NULL,
@@ -9,7 +10,7 @@ CREATE TABLE Profile_(
     email VARCHAR(40),
     name_ VARCHAR(20),
     Surname VARCHAR(20),
-    Telephone INT
+    Telephone BIGINT
 );
 
 CREATE TABLE User_(
