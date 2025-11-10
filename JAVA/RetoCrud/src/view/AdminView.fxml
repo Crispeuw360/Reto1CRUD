@@ -16,7 +16,6 @@
     
    <children>
       <Button id="btnBack" fx:id="btnBack" layoutX="596.0" layoutY="18.0" mnemonicParsing="false" onAction="#onBack" prefHeight="30.0" prefWidth="110.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Close session" textFill="WHITE">
-      <Button id="btnBack" fx:id="btnBack" layoutX="596.0" layoutY="18.0" mnemonicParsing="false" onAction="#onBack" prefHeight="30.0" prefWidth="110.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Close session" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font></Button>
@@ -95,6 +94,6 @@
             <Font size="14.0" />
          </font>
       </Button>
-      <ComboBox fx:id="comboUsers" layoutX="14.0" layoutY="59.0" prefWidth="150.0" style="-fx-background-radius: 50;" />
+      
    </children>
 </AnchorPane>

@@ -22,7 +22,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.User_;
 
@@ -151,6 +150,7 @@ public class ModifyWindowController implements Initializable {
         setEditableFields(true);
         btnSave.setDisable(false);
         btnModify.setDisable(true);
+        userLabel.setDisable(true);
     }
 
     @FXML

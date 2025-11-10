@@ -12,9 +12,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.stage.Stage;
-import view.LoginWindowController;
-
 /**
  *
  * @author pablo

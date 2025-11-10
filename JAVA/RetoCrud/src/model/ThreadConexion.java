@@ -7,7 +7,6 @@ import javafx.scene.control.Alert;
 
 public class ThreadConexion extends Thread {
     private Connection conexion;
-    private boolean connected;
 
     public ThreadConexion(Connection conexion) {
         this.conexion = conexion;
@@ -16,10 +15,8 @@ public class ThreadConexion extends Thread {
     @Override
     public void run() {
         try {
-            connected = true;
             System.out.println("Conexión establecida");
-            Thread.sleep(30000);
-            connected = false;
+            Thread.sleep(30000); 
             System.out.println("Conexión liberada");
         } catch (InterruptedException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

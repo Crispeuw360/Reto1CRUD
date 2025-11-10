@@ -20,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import model.ImplementsBD;
 import model.User_;
 
 /**
@@ -75,9 +74,8 @@ public class SignUpController implements Initializable {
 
     
     
-    private ImplementsBD bd = new ImplementsBD(); // acceso a BD
     private Controller con = new Controller(); 
-    private boolean passwordsVisible = false;    // para mostrar/ocultar contraseñas
+    
     /**
      * Initializes the controller class.
      */
@@ -164,7 +162,6 @@ public class SignUpController implements Initializable {
                 card,
                 comboGender.getValue()
         );
-        boolean exists=false;
         if (con.existUser(fieldUser.getText())){
             System.out.println("Usuario ya existente");
             showError("Usuario ya existente");
