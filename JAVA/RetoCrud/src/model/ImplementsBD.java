@@ -34,11 +34,11 @@ public class ImplementsBD implements UserDAO {
             + "FROM Profile_ p "
             + "INNER JOIN User_ u ON p.user_code = u.Profile_code "
             + "WHERE p.user_name = ?";
-    private final String sqlAdmin = "SELECT COUNT(*) FROM Profile_ WHERE user_name = ? AND passwd = ?";
+    private final String sqlAdmin = "SELECT user_code FROM Profile_ WHERE user_name = ?";
+    private final String sqlAdmin2 =  "SELECT COUNT(*) FROM Admin_ WHERE Profile_code = ?";
     private final String sqlUpdateUser = " UPDATE User_ SET card_no=?, gender=? WHERE Profile_code=?";
     private final String sqlUpdateProfile = "UPDATE Profile_ SET passwd = ?, email = ?, name_ = ?, Surname = ?, Telephone = ? WHERE user_name = ?";
     private final String sqlDeleteProfile = "DELETE FROM Profile_ WHERE user_name = ? ";
-    private final String sqlDeleteUser = "DELETE FROM User_ WHERE Profile_code = ?";
     private final String sqlListUsers = "SELECT p.user_code, p.user_name, p.passwd, p.email, p.name_, p.Surname, p.Telephone, "
             + "u.card_no, u.gender "
             + "FROM Profile_ p "
@@ -149,7 +149,7 @@ public class ImplementsBD implements UserDAO {
         return inserted;
     }
 
-    public boolean deleteUser(String username) {
+    public boolean deleteUser(String username,int profile_code) {
         boolean deleted = false;
         threadConexion = new ThreadConexion(con);
         threadConexion.start();
@@ -162,10 +162,6 @@ public class ImplementsBD implements UserDAO {
             }
 
             stmt = con.prepareStatement(sqlDeleteProfile);
-            stmt.setString(1, username);
-            deleted = stmt.executeUpdate() > 0;
-            stmt.close();
-            stmt = con.prepareStatement(sqlDeleteUser);
             stmt.setString(1, username);
             deleted = stmt.executeUpdate() > 0;
             stmt.close();
@@ -353,8 +349,7 @@ public class ImplementsBD implements UserDAO {
 
             // 🔹 Si existe, mirar si aparece en la tabla Admin_
             if (userCode != -1) {
-                String sql2 = "SELECT COUNT(*) FROM Admin_ WHERE Profile_code = ?";
-                stmt = con.prepareStatement(sql2);
+                stmt = con.prepareStatement(sqlAdmin2);
                 stmt.setInt(1, userCode);
                 ResultSet rs2 = stmt.executeQuery();
 

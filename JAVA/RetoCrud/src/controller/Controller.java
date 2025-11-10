@@ -40,8 +40,8 @@ public class Controller {
     public boolean isAdmin(String username){
         return userDAO.isAdmin(username);
     }
-    public boolean deleteUser(String username){
-        return userDAO.deleteUser(username);
+    public boolean deleteUser(String username,int profile_code){
+        return userDAO.deleteUser(username,profile_code);
     }
       
 }

@@ -75,6 +75,8 @@ public class AdminViewController implements Initializable {
     private User_ user;
     private Map<String, User_> users = new HashMap<>();
     private Controller con = new Controller();
+    @FXML
+    private Button btnDelete;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -149,6 +151,7 @@ public class AdminViewController implements Initializable {
     private void onModify(ActionEvent event) {
         // implementar modificar
         setEditableFields(true);
+        comboGender.getItems().addAll("Male", "Female", "Other");
     }
 
     @FXML
@@ -228,4 +231,45 @@ public class AdminViewController implements Initializable {
         fieldPass.setEditable(editable);
         fieldPass2.setEditable(editable);
     }
+
+   @FXML
+private void onDelete(ActionEvent event) {
+    String selectedUsername = comboUsers.getValue();
+    if (selectedUsername == null || selectedUsername.isEmpty()) {
+        showAlert("Por favor, selecciona un usuario para eliminar.", Alert.AlertType.ERROR);
+        return;
+    }
+    
+    User_ user = users.get(selectedUsername); // ✅ Use username from combo box
+    if (user == null) {
+        showAlert("Usuario no encontrado.", Alert.AlertType.ERROR);
+        return;
+    }
+    
+    boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+    if (ok) {
+        showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+        comboUsers.getItems().remove(user.getUser_name());
+        users.remove(user.getUser_name()); // Also remove from local map
+        clearFields();
+        setEditableFields(false);
+        btnSave.setDisable(true);
+        btnModify.setDisable(true);
+    } else {
+        showAlert("Error al eliminar el usuario.", Alert.AlertType.ERROR);
+    }
+}
+
+// Add this helper method to clear fields after deletion
+private void clearFields() {
+    fieldUser.clear();
+    fieldName.clear();
+    fieldSurname.clear();
+    fieldGmail.clear();
+    fieldTel.clear();
+    fieldCard.clear();
+    fieldPass.clear();
+    fieldPass2.clear();
+    comboGender.setValue(null);
+}
 }

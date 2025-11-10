@@ -76,9 +76,12 @@ public class ModifyWindowController implements Initializable {
     private ComboBox<String> comboGender;
     @FXML
     private Button btnSave;
-    
+
     private Controller con = new Controller();
+    private boolean passwordVisible = false;
     private User_ currentUser;
+    @FXML
+    private Button btnDelete;
 
     /**
      * Initializes the controller class.
@@ -86,13 +89,13 @@ public class ModifyWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        
+
         if (comboGender != null) {
             comboGender.getItems().clear(); // por si acaso
             comboGender.getItems().addAll("Masculino", "Femenino", "Otro");
             comboGender.setDisable(true); // bloqueado al inicio
         }
-    }    
+    }
 
     public void setUser(User_ user) {
         this.currentUser = user;
@@ -110,7 +113,7 @@ public class ModifyWindowController implements Initializable {
         comboGender.setValue(user.getGender());
         btnSave.setDisable(true);
         setEditableFields(false);
-        
+
     }
 
     @FXML
@@ -141,7 +144,6 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
-
     @FXML
     private void onModify(ActionEvent event) {
         setEditableFields(true);
@@ -153,14 +155,14 @@ public class ModifyWindowController implements Initializable {
     private void onRegister(ActionEvent event) {
         // Comprobamos que todos los campos estén completos
         if (fieldUser.getText().isEmpty() ||
-            fieldName.getText().isEmpty() ||
-            fieldSurname.getText().isEmpty() ||
-            fieldGmail.getText().isEmpty() ||
-            fieldTel.getText().isEmpty() ||
-            fieldPass.getText().isEmpty() ||
-            fieldPass2.getText().isEmpty() ||
-            fieldCard.getText().isEmpty() ||
-            comboGender.getValue() == null) {
+                fieldName.getText().isEmpty() ||
+                fieldSurname.getText().isEmpty() ||
+                fieldGmail.getText().isEmpty() ||
+                fieldTel.getText().isEmpty() ||
+                fieldPass.getText().isEmpty() ||
+                fieldPass2.getText().isEmpty() ||
+                fieldCard.getText().isEmpty() ||
+                comboGender.getValue() == null) {
 
             showAlert("Por favor, rellena todos los campos.", Alert.AlertType.ERROR);
             return;
@@ -188,7 +190,7 @@ public class ModifyWindowController implements Initializable {
             return;
         }
 
-        //Si todo es correcto → actualizamos el objeto y llamamos a BD
+        // Si todo es correcto → actualizamos el objeto y llamamos a BD
         currentUser.setUser_name(fieldUser.getText());
         currentUser.setName_(fieldName.getText());
         currentUser.setSurname(fieldSurname.getText());
@@ -215,9 +217,10 @@ public class ModifyWindowController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
-     }
+    }
+
     private void setEditableFields(boolean editable) {
-        
+
         fieldName.setEditable(editable);
         fieldGmail.setEditable(editable);
         fieldSurname.setEditable(editable);
@@ -228,5 +231,57 @@ public class ModifyWindowController implements Initializable {
         fieldPass.setEditable(editable);
         fieldPass2.setEditable(editable);
     }
-    
+
+    @FXML
+    private void showPass(ActionEvent event) {
+        passwordVisible = !passwordVisible;
+
+        if (passwordVisible) {
+            // Mostrar contraseñas en texto plano
+            fieldPass.setPromptText(fieldPass.getText());
+            fieldPass2.setPromptText(fieldPass2.getText());
+            fieldPass.setText("");
+            fieldPass2.setText("");
+            btnShow.setText("👁"); // Cambiar ícono del botón
+        } else {
+            // Ocultar contraseñas (volver a modo puntos)
+            fieldPass.setText(fieldPass.getPromptText());
+            fieldPass2.setText(fieldPass2.getPromptText());
+            fieldPass.setPromptText("");
+            fieldPass2.setPromptText("");
+            btnShow.setText("👁"); // Mantener mismo ícono o cambiar si prefieres
+        }
+    }
+
+    @FXML
+    private void onDelete(ActionEvent event) {
+        try {
+            // Cargar el FXML de la ventana de login
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DropOutWindow.fxml"));
+            Parent root = loader.load();
+            String username = fieldUser.getText();
+            DropOutController controller = loader.getController();
+            controller.setUsername(username);
+
+            // Crear la escena y ventana (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("Eliminar usuario");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.show();
+
+            // Cerrar la ventana actual
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error al volver");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo abrir la ventana de login.");
+            alert.showAndWait();
+        }
+    }
+
 }

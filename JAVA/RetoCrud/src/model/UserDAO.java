@@ -26,5 +26,5 @@ public interface UserDAO {
     
     public boolean isAdmin(String username);
 
-    public boolean deleteUser(String username);
+    public boolean deleteUser(String username,int profile_code);
 }

@@ -19,7 +19,7 @@
          <font>
             <Font size="14.0" />
          </font></Button>
-      <Button id="btnModify" fx:id="btnModify" layoutX="290.0" layoutY="444.0" mnemonicParsing="false" onAction="#onModify" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Modify" textFill="WHITE">
+      <Button id="btnModify" fx:id="btnModify" layoutX="238.0" layoutY="444.0" mnemonicParsing="false" onAction="#onModify" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Modify" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font></Button>
@@ -65,8 +65,8 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button id="btnShow" fx:id="btnShow" layoutX="583.0" layoutY="343.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" />
-      <Label layoutX="260.0" layoutY="18.0" text="SIGN UP">
+      <Button id="btnShow" fx:id="btnShow" layoutX="583.0" layoutY="343.0" mnemonicParsing="false" onAction="#showPass" prefHeight="26.0" prefWidth="26.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" />
+      <Label layoutX="278.0" layoutY="14.0" text="User Panel">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -83,7 +83,12 @@
          </font>
       </Label>
       <ComboBox fx:id="comboGender" layoutX="348.0" layoutY="260.0" prefHeight="26.0" prefWidth="226.0" style="-fx-background-radius: 50;" />
-      <Button id="btnRegistro" fx:id="btnSave" layoutX="393.0" layoutY="444.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Save" textFill="WHITE">
+      <Button id="btnRegistro" fx:id="btnSave" layoutX="341.0" layoutY="444.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Save" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Button id="btnModify" fx:id="btnDelete" layoutX="442.0" layoutY="444.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Delete" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font>

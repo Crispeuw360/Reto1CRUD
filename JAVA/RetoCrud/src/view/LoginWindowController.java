@@ -96,14 +96,14 @@ public class LoginWindowController implements Initializable {
 
                     if (isAdmin) {
                         // 🔸 Si es admin, cargar AdminView.fxml
-                        loader = new FXMLLoader(getClass().getResource("/view/AdminView.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("AdminView.fxml"));
                         root = loader.load();
 
                        
                         stage.setTitle("Panel de Administración");
                     } else {
                         // 🔹 Si es usuario normal, cargar ModifyWindow.fxml
-                        loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
                         root = loader.load();
 
                         ModifyWindowController modifyController = loader.getController();
@@ -122,7 +122,6 @@ public class LoginWindowController implements Initializable {
                     currentStage.close();
 
                 } catch (IOException e) {
-                    e.printStackTrace();
                     showError("No se pudo abrir la ventana correspondiente.");
                 }
                 clearFields();
