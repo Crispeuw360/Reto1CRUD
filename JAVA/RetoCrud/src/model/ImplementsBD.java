@@ -48,7 +48,7 @@ public class ImplementsBD implements UserDAO {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }  
+        }
 
 
     public boolean existUser(String username) {
@@ -137,7 +137,7 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al validar contraseña");
+            System.out.println(" Error al validar contraseña");
             e.printStackTrace();
         } 
         return valid;
@@ -175,7 +175,7 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al obtener el usuario completo por nombre");
+            System.out.println("Error al obtener el usuario completo por nombre");
             e.printStackTrace();
         }
 

@@ -27,12 +27,16 @@ import javafx.stage.Stage;
 import model.User_;
 
 /**
- * FXML Controller class
- *
- * @author pablo
+ * Controlador para la ventana de modificación de perfil de usuario.
+ * Permite a los usuarios visualizar y modificar sus datos personales,
+ * incluyendo información básica, credenciales y datos de contacto.
+ * 
+ * @author pikain
+ * @version 1.0
  */
 public class ModifyWindowController implements Initializable {
 
+    // Componentes de la interfaz de usuario
     @FXML
     private Button btnBack;
     @FXML
@@ -77,19 +81,24 @@ public class ModifyWindowController implements Initializable {
     private ComboBox<String> comboGender;
     @FXML
     private Button btnSave;
-    
-    private Controller con = new Controller();
-    private User_ currentUser;
     @FXML
     private AnchorPane comboUsers;
+    
+    // Controlador para la lógica de negocio y usuario actual
+    private Controller con = new Controller();
+    private User_ currentUser;
 
     /**
      * Initializes the controller class.
+     * Configura los valores iniciales del ComboBox de género y establece
+     * el estado inicial de los componentes de la interfaz.
+     * 
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param rb The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        
+        // Configurar las opciones del ComboBox de género
         if (comboGender != null) {
             comboGender.getItems().clear(); // por si acaso
             comboGender.getItems().addAll("Masculino", "Femenino", "Otro");
@@ -97,6 +106,13 @@ public class ModifyWindowController implements Initializable {
         }
     }    
 
+    /**
+     * Establece el usuario actual y carga sus datos en los campos correspondientes.
+     * Inicializa la interfaz con la información del usuario y configura el estado
+     * inicial de los campos como no editables.
+     * 
+     * @param user El usuario cuyos datos se mostrarán en la interfaz
+     */
     public void setUser(User_ user) {
         this.currentUser = user;
 
@@ -117,6 +133,12 @@ public class ModifyWindowController implements Initializable {
         
     }
 
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cierra la ventana actual de modificación y abre la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onBack(ActionEvent event) {
         try {
@@ -145,7 +167,13 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
-
+    /**
+     * Maneja el evento del botón "Modificar".
+     * Habilita la edición de los campos del formulario y ajusta el estado
+     * de los botones para permitir guardar los cambios.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onModify(ActionEvent event) {
         setEditableFields(true);
@@ -153,6 +181,13 @@ public class ModifyWindowController implements Initializable {
         btnModify.setDisable(true);
     }
 
+    /**
+     * Maneja el evento del botón "Registrar/Guardar".
+     * Valida los datos ingresados y actualiza el usuario en la base de datos
+     * si todas las validaciones son exitosas.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onRegister(ActionEvent event) {
         // Comprobamos que todos los campos estén completos
@@ -214,12 +249,24 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
+    /**
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
+     * 
+     * @param msg El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
      }
+
+    /**
+     * Establece el estado de edición de los campos del formulario.
+     * 
+     * @param editable true para habilitar la edición, false para deshabilitarla
+     */
     private void setEditableFields(boolean editable) {
         
         fieldName.setEditable(editable);

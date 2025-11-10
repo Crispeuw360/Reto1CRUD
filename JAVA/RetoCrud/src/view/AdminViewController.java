@@ -23,10 +23,19 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.User_;
 
+/**
+ * Controlador para la vista de administración de usuarios.
+ * Esta clase maneja la interfaz que permite a los administradores visualizar,
+ * seleccionar y modificar los datos de los usuarios del sistema.
+ * 
+ * @author pikain
+ * @version 1.0
+ */
 public class AdminViewController implements Initializable {
 
-    @FXML
-    private ComboBox<String> comboUsers; //
+    // Componentes de la interfaz de usuario
+    @FXML 
+    private ComboBox<String> comboUsers;
     @FXML
     private Button btnBack;
     @FXML
@@ -72,10 +81,19 @@ public class AdminViewController implements Initializable {
     @FXML
     private Button btnSave;
 
+    // Variables de instancia
     private User_ user;
     private Map<String, User_> users = new HashMap<>();
     private Controller con = new Controller();
 
+    /**
+     * Inicializa el controlador después de que se haya cargado su elemento raíz.
+     * Carga todos los usuarios desde la base de datos, configura el ComboBox
+     * y establece el estado inicial de los componentes.
+     * 
+     * @param url La ubicación utilizada para resolver rutas relativas para el objeto raíz, o null si no está disponible
+     * @param rb Los recursos utilizados para localizar el objeto raíz, o null si no está disponible
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Cargar todos los usuarios desde la BD
@@ -93,6 +111,11 @@ public class AdminViewController implements Initializable {
         comboUsers.setOnAction(e -> onUserSelected());
     }
 
+    /**
+     * Maneja el evento de selección de usuario en el ComboBox.
+     * Cuando se selecciona un usuario, carga sus datos en los campos correspondientes
+     * y habilita los botones de modificación y guardado.
+     */
     private void onUserSelected() {
         String selectedUsername = comboUsers.getValue();
         if (selectedUsername != null) {
@@ -109,14 +132,17 @@ public class AdminViewController implements Initializable {
                 comboGender.setValue(user.getGender());
                 setEditableFields(false);
                 btnSave.setDisable(false);
-                btnModify.setDisable(false);
-                
-                
-                
+                btnModify.setDisable(false);  
             }
         }
     }
 
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cierra la ventana actual de administración y abre la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onBack(ActionEvent event) {
         try {
@@ -145,12 +171,25 @@ public class AdminViewController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Modificar".
+     * Habilita la edición de los campos del usuario seleccionado.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onModify(ActionEvent event) {
         // implementar modificar
         setEditableFields(true);
     }
 
+    /**
+     * Maneja el evento del botón "Registrar/Guardar".
+     * Valida los datos ingresados y actualiza el usuario en la base de datos
+     * si todas las validaciones son exitosas.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onRegister(ActionEvent event) {
         // Comprobamos que todos los campos estén completos
@@ -211,12 +250,25 @@ public class AdminViewController implements Initializable {
             showAlert("Error al actualizar el usuario.", Alert.AlertType.ERROR);
         }
     }
+
+    /**
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
+     * 
+     * @param msg El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
      }
+
+    /**
+     * Establece el estado de edición de los campos del formulario.
+     * 
+     * @param editable true para habilitar la edición, false para deshabilitarla
+     */
     private void setEditableFields(boolean editable) {
         
         fieldName.setEditable(editable);

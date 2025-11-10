@@ -25,12 +25,16 @@ import javafx.stage.Stage;
 import model.User_;
 
 /**
- * FXML Controller class
- *
- * @author pablo
+ * Controlador para la ventana de inicio de sesión.
+ * Maneja la autenticación de usuarios, redireccionando a diferentes vistas
+ * según el tipo de usuario (administrador o usuario normal).
+ * 
+ * @author pikain
+ * @version 1.0
  */
 public class LoginWindowController implements Initializable {
 
+    // Componentes de la interfaz de usuario
     @FXML
     private AnchorPane backgroundPanel;
     @FXML
@@ -52,10 +56,16 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Label msgLabel;
 
-    
+    // Controlador para la lógica de negocio
     private Controller con = new Controller();
+    
     /**
      * Initializes the controller class.
+     * Configura los listeners para habilitar/deshabilitar el botón de login
+     * según si los campos están completos.
+     * 
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param rb The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -66,21 +76,30 @@ public class LoginWindowController implements Initializable {
         passwordField.textProperty().addListener((obs, oldV, newV) -> checkFields());
     }
 
+    /**
+     * Verifica si ambos campos (usuario y contraseña) están completos
+     * y habilita o deshabilita el botón de login en consecuencia.
+     */
     private void checkFields() {
         boolean filled = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
         loginBtn.setDisable(!filled);
     } 
 
+    /**
+     * Maneja el evento de inicio de sesión.
+     * Valida las credenciales del usuario y redirige a la vista correspondiente
+     * según su tipo (administrador o usuario normal).
+     */
     @FXML
     private void onLogin() {
-        String username= usernameField.getText();
+        String username = usernameField.getText();
         boolean existe = con.existUser(username);
         if (!existe){
             showError("No existe el usuario");
                     
         }
         else{
-            String password= passwordField.getText();
+            String password = passwordField.getText();
             boolean valido = con.validatePassword(username, password);
             if (valido){
                 showSuccess("USUARIO ENCONTRADO");
@@ -132,6 +151,11 @@ public class LoginWindowController implements Initializable {
             }
         }
     }
+
+    /**
+     * Maneja el evento de registro de nuevo usuario.
+     * Abre la ventana de registro y cierra la ventana actual de login.
+     */
     @FXML
     private void onSignUp() {
         try {
@@ -157,6 +181,12 @@ public class LoginWindowController implements Initializable {
             showError("No se pudo abrir la ventana de registro.");
         }
     }
+
+    /**
+     * Muestra un mensaje de error al usuario.
+     * 
+     * @param msg El mensaje de error a mostrar
+     */
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -165,6 +195,11 @@ public class LoginWindowController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Muestra un mensaje de éxito o información al usuario.
+     * 
+     * @param msg El mensaje de éxito a mostrar
+     */
     private void showSuccess(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Login correcto");
@@ -172,6 +207,10 @@ public class LoginWindowController implements Initializable {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+
+    /**
+     * Limpia los campos de usuario y contraseña.
+     */
     private void clearFields(){
         usernameField.setText("");
         passwordField.setText("");
