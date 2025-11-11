@@ -23,15 +23,20 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.User_;
 
+/**
+ * Controlador para la vista de administración de usuarios.
+ * Permite a los administradores visualizar, modificar y eliminar usuarios del sistema.
+ * Proporciona funcionalidades completas de gestión de usuarios incluyendo edición
+ * de datos personales, credenciales y eliminación de cuentas.
+ * 
+ * @author Estudiante DAM
+ * @version 1.0
+ */
 public class AdminViewController implements Initializable {
 
     // Componentes de la interfaz de usuario
     @FXML 
     private ComboBox<String> comboUsers;
-    @FXML
-    private Button btnBack;
-    @FXML
-    private ComboBox<String> comboUsers; //
     @FXML
     private Button btnBack;
     @FXML
@@ -76,16 +81,25 @@ public class AdminViewController implements Initializable {
     private ComboBox<String> comboGender;
     @FXML
     private Button btnSave;
-
-    private User_ user;
-    private Map<String, User_> users = new HashMap<>();
-    private Controller con = new Controller();
     @FXML
     private Button btnDelete;
 
+    // Variables de instancia
+    private User_ user;
+    private Map<String, User_> users = new HashMap<>();
+    private Controller con = new Controller();
+
+    /**
+     * Inicializa el controlador después de que se haya cargado su elemento raíz.
+     * Carga todos los usuarios desde la base de datos, configura el ComboBox
+     * y establece el estado inicial de los componentes de la interfaz.
+     * 
+     * @param url La ubicación utilizada para resolver rutas relativas para el objeto raíz, o null si no está disponible
+     * @param rb Los recursos utilizados para localizar el objeto raíz, o null si no está disponible
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //Cargar todos los usuarios desde la BD
+        // Cargar todos los usuarios desde la BD
         users = con.getAllUsers();
 
         // Rellenar el ComboBox con sus usernames
@@ -96,10 +110,15 @@ public class AdminViewController implements Initializable {
         btnModify.setDisable(true);
         fieldUser.setEditable(false);
 
-        //Detectar cuando el usuario cambia la selección
+        // Detectar cuando el usuario cambia la selección
         comboUsers.setOnAction(e -> onUserSelected());
     }
 
+    /**
+     * Maneja el evento de selección de usuario en el ComboBox.
+     * Cuando se selecciona un usuario, carga sus datos en los campos correspondientes
+     * y habilita los botones de modificación y guardado.
+     */
     private void onUserSelected() {
         String selectedUsername = comboUsers.getValue();
         if (selectedUsername != null) {
@@ -117,13 +136,16 @@ public class AdminViewController implements Initializable {
                 setEditableFields(false);
                 btnSave.setDisable(false);
                 btnModify.setDisable(false);
-                
-                
-                
             }
         }
     }
 
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cierra la ventana actual de administración y abre la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onBack(ActionEvent event) {
         try {
@@ -152,13 +174,26 @@ public class AdminViewController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Modificar".
+     * Habilita la edición de los campos del formulario y carga las opciones
+     * de género en el ComboBox.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onModify(ActionEvent event) {
-        // implementar modificar
         setEditableFields(true);
         comboGender.getItems().addAll("Male", "Female", "Other");
     }
 
+    /**
+     * Maneja el evento del botón "Guardar/Registrar".
+     * Valida los datos ingresados y actualiza el usuario en la base de datos
+     * si todas las validaciones son exitosas.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onRegister(ActionEvent event) {
         // Comprobamos que todos los campos estén completos
@@ -198,7 +233,7 @@ public class AdminViewController implements Initializable {
             return;
         }
 
-        //Si todo es correcto → actualizamos el objeto y llamamos a BD
+        // Si todo es correcto → actualizamos el objeto y llamamos a BD
         user.setUser_name(fieldUser.getText());
         user.setName_(fieldName.getText());
         user.setSurname(fieldSurname.getText());
@@ -219,62 +254,83 @@ public class AdminViewController implements Initializable {
             showAlert("Error al actualizar el usuario.", Alert.AlertType.ERROR);
         }
     }
+
+    /**
+     * Maneja el evento del botón "Eliminar".
+     * Elimina el usuario seleccionado de la base de datos después de confirmación.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
+    @FXML
+    private void onDelete(ActionEvent event) {
+        String selectedUsername = comboUsers.getValue();
+        if (selectedUsername == null || selectedUsername.isEmpty()) {
+            showAlert("Por favor, selecciona un usuario para eliminar.", Alert.AlertType.ERROR);
+            return;
+        }
+        
+        User_ user = users.get(selectedUsername);
+        if (user == null) {
+            showAlert("Usuario no encontrado.", Alert.AlertType.ERROR);
+            return;
+        }
+        
+        boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+        if (ok) {
+            showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+            comboUsers.getItems().remove(user.getUser_name());
+            users.remove(user.getUser_name());
+            clearFields();
+            setEditableFields(false);
+            btnSave.setDisable(true);
+            btnModify.setDisable(true);
+        } else {
+            showAlert("Error al eliminar el usuario.", Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
+     * 
+     * @param msg El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
-     }
+    }
+
+    /**
+     * Establece el estado de edición de los campos del formulario.
+     * 
+     * @param editable true para habilitar la edición, false para deshabilitarla
+     */
     private void setEditableFields(boolean editable) {
-        
         fieldName.setEditable(editable);
         fieldGmail.setEditable(editable);
         fieldSurname.setEditable(editable);
         fieldTel.setEditable(editable);
         fieldCard.setEditable(editable);
-        comboGender.setDisable(!editable); // 👈 este es el truco
+        comboGender.setDisable(!editable);
         fieldPass.setEditable(editable);
         fieldPass2.setEditable(editable);
     }
 
-   @FXML
-private void onDelete(ActionEvent event) {
-    String selectedUsername = comboUsers.getValue();
-    if (selectedUsername == null || selectedUsername.isEmpty()) {
-        showAlert("Por favor, selecciona un usuario para eliminar.", Alert.AlertType.ERROR);
-        return;
+    /**
+     * Limpia todos los campos del formulario.
+     * Utilizado después de eliminar un usuario o para resetear la interfaz.
+     */
+    private void clearFields() {
+        fieldUser.clear();
+        fieldName.clear();
+        fieldSurname.clear();
+        fieldGmail.clear();
+        fieldTel.clear();
+        fieldCard.clear();
+        fieldPass.clear();
+        fieldPass2.clear();
+        comboGender.setValue(null);
     }
-    
-    User_ user = users.get(selectedUsername); // ✅ Use username from combo box
-    if (user == null) {
-        showAlert("Usuario no encontrado.", Alert.AlertType.ERROR);
-        return;
-    }
-    
-    boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
-    if (ok) {
-        showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
-        comboUsers.getItems().remove(user.getUser_name());
-        users.remove(user.getUser_name()); // Also remove from local map
-        clearFields();
-        setEditableFields(false);
-        btnSave.setDisable(true);
-        btnModify.setDisable(true);
-    } else {
-        showAlert("Error al eliminar el usuario.", Alert.AlertType.ERROR);
-    }
-}
-
-// Add this helper method to clear fields after deletion
-private void clearFields() {
-    fieldUser.clear();
-    fieldName.clear();
-    fieldSurname.clear();
-    fieldGmail.clear();
-    fieldTel.clear();
-    fieldCard.clear();
-    fieldPass.clear();
-    fieldPass2.clear();
-    comboGender.setValue(null);
-}
 }

@@ -68,4 +68,12 @@ public interface UserDAO {
      * @return true si el usuario es administrador, false si es usuario normal
      */
     public boolean isAdmin(String username);
+    
+    /**
+     * Elimina un usuario.
+     * @param username nombre de usuario
+     * @param profile_code codigo de perfil
+     * @return true si elimina
+     */
+    public boolean deleteUser(String username,int profile_code);
 }

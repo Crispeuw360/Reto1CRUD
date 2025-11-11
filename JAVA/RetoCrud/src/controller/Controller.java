@@ -88,4 +88,14 @@ public class Controller {
     public boolean isAdmin(String username){
         return userDAO.isAdmin(username);
     }
+    
+    /**
+     * Elimina un usuario.
+     * @param username nombre de usuario
+     * @param profile_code codigo de perfil
+     * @return true si elimina
+     */
+    public boolean deleteUser(String username,int profile_code){
+        return userDAO.deleteUser(username, profile_code);
+    }
 }

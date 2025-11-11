@@ -27,12 +27,17 @@ import javafx.stage.Stage;
 import model.User_;
 
 /**
- * FXML Controller class
- *
- * @author 2dami
+ * Controlador para la ventana de baja de usuarios (Drop Out).
+ * Permite a los usuarios eliminar permanentemente su cuenta del sistema
+ * después de confirmar su identidad. Incluye medidas de seguridad para
+ * prevenir eliminaciones accidentales.
+ * 
+ * @author pikain
+ * @version 1.0
  */
 public class DropOutController implements Initializable {
 
+    // Componentes de la interfaz de usuario
     @FXML
     private Button ConfirmBtn;
     @FXML
@@ -55,33 +60,56 @@ public class DropOutController implements Initializable {
     private Label deleteLabel;
     @FXML
     private Button exitBtn;
+    
+    // Controlador para la lógica de negocio
     private Controller con = new Controller();
 
     /**
      * Initializes the controller class.
+     * Configura el estado inicial de los componentes de la interfaz.
+     * 
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param rb The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // TODO - Puede ser utilizado para inicializaciones adicionales
     }
 
+    /**
+     * Establece el nombre de usuario en el campo correspondiente.
+     * Utilizado para pre-cargar el username del usuario que desea darse de baja.
+     * 
+     * @param username El nombre de usuario a mostrar en el campo
+     */
     public void setUsername(String username) {
         this.usernameField.setText(username);
     }
 
+    /**
+     * Maneja el evento de eliminación de cuenta.
+     * Elimina permanentemente el usuario del sistema después de obtener
+     * sus datos desde la base de datos. Si la eliminación es exitosa,
+     * redirige a la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onDelete(ActionEvent event) {
+        // Obtener el usuario desde la base de datos
         User_ user = con.getUserByUsername(usernameField.getText());
-        boolean ok = con.deleteUser(user.getUser_name(),user.getUser_code());
+        
+        // Intentar eliminar el usuario
+        boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+        
         if (ok) {
             showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
             exitBtn.setDisable(false);
+            
             try {
                 // Cargar el FXML de la ventana de login
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
                 Parent root = loader.load();
-
-                
 
                 // Crear la escena y ventana (Stage)
                 Stage stage = new Stage();
@@ -107,13 +135,21 @@ public class DropOutController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cancela el proceso de baja y redirige a la ventana de modificación de perfil
+     * manteniendo los datos del usuario actual.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void OnBack(ActionEvent event) {
         try {
-            // Cargar el FXML de la ventana de login
+            // Cargar el FXML de la ventana de modificación
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
             Parent root = loader.load();
 
+            // Configurar el controlador con los datos del usuario actual
             ModifyWindowController modifyController = loader.getController();
             User_ user = con.getUserByUsername(usernameField.getText());
             modifyController.setUser(user);
@@ -139,11 +175,16 @@ public class DropOutController implements Initializable {
         }
     }
 
+    /**
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
+     * 
+     * @param msg El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
     }
-
 }

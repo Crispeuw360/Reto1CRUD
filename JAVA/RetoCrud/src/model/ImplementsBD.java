@@ -16,15 +16,19 @@ import javafx.stage.Stage;
 import view.LoginWindowController;
 
 /**
- *
+ * Implementación concreta de la interfaz UserDAO para operaciones de base de datos.
+ * Gestiona todas las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para usuarios,
+ * utilizando un pool de conexiones para optimizar el rendimiento y manejar timeouts.
+ * 
  * @author pablo
+ * @version 1.0
  */
 public class ImplementsBD implements UserDAO {
     private Connection con;
     private PreparedStatement stmt;
     private ThreadConexion threadConexion;
 
-    //All sql 
+    // Consultas SQL predefinidas para optimizar el rendimiento
     private final String sqlProfile = "INSERT INTO Profile_ (user_name, passwd, email, name_, Surname, Telephone) VALUES (?,?,?,?,?,?)";
     private final String sqlUser = "INSERT INTO User_ (Profile_code, card_no, gender) VALUES (?,?,?)";
     private final String sqlExistUser = "SELECT COUNT(*) FROM Profile_ WHERE user_name = ?";
@@ -44,10 +48,17 @@ public class ImplementsBD implements UserDAO {
             + "FROM Profile_ p "
             + "INNER JOIN User_ u ON p.user_code = u.Profile_code";
 
-
+    /**
+     * Constructor por defecto de la clase ImplementsBD.
+     * Inicializa la implementación del DAO sin parámetros específicos.
+     */
     public ImplementsBD() {
     }
 
+    /**
+     * Abre una conexión a la base de datos utilizando el pool de conexiones.
+     * Maneja automáticamente los timeouts y errores de conexión de forma silenciosa.
+     */
     private void openConnection() {
         try {
             // ✅ INTENTAR OBTENER CONEXIÓN
@@ -61,23 +72,29 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ MANEJO SILENCIOSO DE ERRORES
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout: Sistema ocupado. Se reseteará en " +
+                System.out.println("Timeout: Sistema ocupado. Se reseteará en " +
                         (30000 - ConexionPoolDBCP.getTimeSinceLastReset()) / 1000 + " segundos");
             } else {
-                System.out.println("⚠️  Error al abrir conexión: " + e.getMessage());
+                System.out.println("Error al abrir conexión: " + e.getMessage());
             }
             con = null;
         }
     }
 
+    /**
+     * Verifica si un usuario existe en la base de datos por su nombre de usuario.
+     * 
+     * @param username El nombre de usuario a verificar
+     * @return true si el usuario existe, false en caso contrario o en caso de error
+     */
     public boolean existUser(String username) {
         boolean exists = false;
 
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles en este momento. Reintentando más tarde...");
-                return false; // ❌ NO mostrar error, solo retornar false silenciosamente
+                System.out.println("No hay conexiones disponibles en este momento. Reintentando más tarde...");
+                return false; //NO mostrar error, solo retornar false silenciosamente
             }
 
             stmt = con.prepareStatement(sqlExistUser);
@@ -94,9 +111,9 @@ public class ImplementsBD implements UserDAO {
             // CAPTURAR ERROR SILENCIOSAMENTE sin printStackTrace
             if (e.getMessage().contains("Timeout")) {
                 System.out
-                        .println("⏳ Timeout de conexión - El sistema está ocupado. Intenta nuevamente en 30 segundos.");
+                        .println("Timeout de conexión - El sistema está ocupado. Intenta nuevamente en 30 segundos.");
             } else {
-                System.out.println("⚠️ Error en existUser: " + e.getMessage());
+                System.out.println("Error en existUser: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -105,6 +122,13 @@ public class ImplementsBD implements UserDAO {
         return exists;
     }
 
+    /**
+     * Inserta un nuevo usuario en la base de datos.
+     * Realiza una inserción en dos tablas: Profile_ y User_ de forma transaccional.
+     * 
+     * @param user El objeto User_ con los datos del usuario a insertar
+     * @return true si la inserción fue exitosa, false en caso contrario
+     */
     public boolean insertUser(User_ user) {
         boolean inserted = false;
         threadConexion = new ThreadConexion(con);
@@ -149,7 +173,14 @@ public class ImplementsBD implements UserDAO {
         return inserted;
     }
 
-    public boolean deleteUser(String username,int profile_code) {
+    /**
+     * Elimina un usuario de la base de datos por su nombre de usuario.
+     * 
+     * @param username El nombre de usuario a eliminar
+     * @param profile_code El código del perfil del usuario (no utilizado actualmente)
+     * @return true si la eliminación fue exitosa, false en caso contrario
+     */
+    public boolean deleteUser(String username, int profile_code) {
         boolean deleted = false;
         threadConexion = new ThreadConexion(con);
         threadConexion.start();
@@ -157,7 +188,7 @@ public class ImplementsBD implements UserDAO {
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles para eliminar usuario");
+                System.out.println("No hay conexiones disponibles para eliminar usuario");
                 return false; // ❌ Sin error en rojo
             }
 
@@ -166,7 +197,7 @@ public class ImplementsBD implements UserDAO {
             deleted = stmt.executeUpdate() > 0;
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al eliminar el usuario");
+            System.out.println("Error al eliminar el usuario");
             e.printStackTrace();
         } finally {
             closeConnection();
@@ -175,13 +206,20 @@ public class ImplementsBD implements UserDAO {
         return deleted;
     }
 
+    /**
+     * Valida la contraseña de un usuario comparándola con la almacenada en la base de datos.
+     * 
+     * @param username El nombre de usuario
+     * @param password La contraseña a validar
+     * @return true si la contraseña coincide, false en caso contrario o en caso de error
+     */
     public boolean validatePassword(String username, String password) {
         boolean valid = false;
 
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles para validar password");
+                System.out.println("No hay conexiones disponibles para validar password");
                 return false; // ❌ Sin error en rojo
             }
 
@@ -201,9 +239,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ Sin error en rojo
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout validando password - Sistema ocupado");
+                System.out.println("Timeout validando password - Sistema ocupado");
             } else {
-                System.out.println("⚠️ Error en validatePassword: " + e.getMessage());
+                System.out.println("Error en validatePassword: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -211,13 +249,19 @@ public class ImplementsBD implements UserDAO {
         return valid;
     }
 
+    /**
+     * Obtiene un usuario completo por su nombre de usuario.
+     * 
+     * @param username El nombre de usuario a buscar
+     * @return El objeto User_ con todos los datos del usuario, o null si no existe o hay error
+     */
     public User_ getUserByUsername(String username) {
         User_ user = null;
 
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles para obtener usuario");
+                System.out.println("No hay conexiones disponibles para obtener usuario");
                 return null; // ❌ Sin error en rojo
             }
 
@@ -243,9 +287,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ Sin error en rojo
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout obteniendo usuario - Sistema ocupado");
+                System.out.println("Timeout obteniendo usuario - Sistema ocupado");
             } else {
-                System.out.println("⚠️ Error en getUserByUsername: " + e.getMessage());
+                System.out.println("Error en getUserByUsername: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -254,6 +298,13 @@ public class ImplementsBD implements UserDAO {
         return user;
     }
 
+    /**
+     * Actualiza los datos de un usuario existente en la base de datos.
+     * Actualiza tanto la tabla Profile_ como la tabla User_.
+     * 
+     * @param user El objeto User_ con los datos actualizados
+     * @return true si la actualización fue exitosa, false en caso contrario
+     */
     public boolean updateUser(User_ user) {
         boolean updated = false;
         threadConexion = new ThreadConexion(con);
@@ -282,7 +333,7 @@ public class ImplementsBD implements UserDAO {
 
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al actualizar el usuario");
+            System.out.println("Error al actualizar el usuario");
             e.printStackTrace();
         } finally {
             closeConnection();
@@ -291,7 +342,12 @@ public class ImplementsBD implements UserDAO {
         return updated;
     }
 
-     public Map<String, User_> getAllUsers() {
+    /**
+     * Obtiene todos los usuarios del sistema.
+     * 
+     * @return Un Map donde la clave es el nombre de usuario y el valor es el objeto User_
+     */
+    public Map<String, User_> getAllUsers() {
         Map<String, User_> usersMap = new HashMap<>();
         threadConexion = new ThreadConexion(con);
         threadConexion.start();
@@ -323,12 +379,19 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al obtener todos los usuarios");
+            System.out.println("Error al obtener todos los usuarios");
             e.printStackTrace();
         }
 
         return usersMap;
     }
+
+    /**
+     * Verifica si un usuario tiene privilegios de administrador.
+     * 
+     * @param username El nombre de usuario a verificar
+     * @return true si el usuario es administrador, false en caso contrario
+     */
     public boolean isAdmin(String username) {
         boolean admin = false;
 
@@ -362,14 +425,17 @@ public class ImplementsBD implements UserDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("❌ Error comprobando si el usuario es administrador");
+            System.out.println("Error comprobando si el usuario es administrador");
             e.printStackTrace();
         }
 
         return admin;
     }
 
-    // Método para cerrar la conexión
+    /**
+     * Cierra la conexión a la base de datos de forma segura.
+     * Devuelve la conexión al pool para su reutilización.
+     */
     private void closeConnection() {
         try {
             if (con != null) {

@@ -41,18 +41,34 @@ public class User_ extends Profile_ {
         this.gender = gender;
     }
 
+    /**
+     * Obtiene el número de tarjeta del usuario.
+     * @return el número de tarjeta
+     */
     public int getCard_no() {
         return card_no;
     }
 
+    /**
+     * Establece el número de tarjeta del usuario.
+     * @param card_no el número de tarjeta a establecer
+     */
     public void setCard_no(int card_no) {
         this.card_no = card_no;
     }
 
+    /**
+     * Obtiene el género del usuario.
+     * @return el género del usuario
+     */
     public String getGender() {
         return gender;
     }
 
+    /**
+     * Establece el género del usuario.
+     * @param gender el género a establecer
+     */
     public void setGender(String gender) {
         this.gender = gender;
     }
