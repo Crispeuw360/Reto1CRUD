@@ -65,10 +65,10 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ MANEJO SILENCIOSO DE ERRORES
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout: Sistema ocupado. Se reseteará en " +
+                System.out.println(" Timeout: Sistema ocupado. Se reseteará en " +
                         (30000 - ConexionPoolDBCP.getTimeSinceLastReset()) / 1000 + " segundos");
             } else {
-                System.out.println("⚠️  Error al abrir conexión: " + e.getMessage());
+                System.out.println(" Error al abrir conexión: " + e.getMessage());
             }
             con = null;
         }
@@ -86,8 +86,8 @@ public class ImplementsBD implements UserDAO {
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles en este momento. Reintentando más tarde...");
-                return false; // ❌ NO mostrar error, solo retornar false silenciosamente
+                System.out.println(" No hay conexiones disponibles en este momento. Reintentando más tarde...");
+                return false; // NO mostrar error, solo retornar false silenciosamente
             }
 
             stmt = con.prepareStatement(sqlExistUser);
@@ -103,10 +103,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // CAPTURAR ERROR SILENCIOSAMENTE sin printStackTrace
             if (e.getMessage().contains("Timeout")) {
-                System.out
-                        .println("⏳ Timeout de conexión - El sistema está ocupado. Intenta nuevamente en 30 segundos.");
+                System.out.println(" Timeout de conexión - El sistema está ocupado. Intenta nuevamente en 30 segundos.");
             } else {
-                System.out.println("⚠️ Error en existUser: " + e.getMessage());
+                System.out.println(" Error en existUser: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -180,8 +179,8 @@ public class ImplementsBD implements UserDAO {
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles para eliminar usuario");
-                return false; // ❌ Sin error en rojo
+                System.out.println(" No hay conexiones disponibles para eliminar usuario");
+                return false; // Sin error en rojo
             }
 
             stmt = con.prepareStatement(sqlDeleteProfile);
@@ -189,8 +188,8 @@ public class ImplementsBD implements UserDAO {
             deleted = stmt.executeUpdate() > 0;
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al eliminar el usuario");
-            e.printStackTrace();
+            System.out.println(" Error al eliminar el usuario");
+            
         } finally {
             closeConnection();
         }
@@ -211,8 +210,8 @@ public class ImplementsBD implements UserDAO {
         try {
             openConnection();
             if (con == null) {
-                System.out.println("⏳ No hay conexiones disponibles para validar password");
-                return false; // ❌ Sin error en rojo
+                System.out.println(" No hay conexiones disponibles para validar password");
+                return false; // Sin error en rojo
             }
 
             stmt = con.prepareStatement(sqlValidatePassword);
@@ -231,9 +230,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ Sin error en rojo
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout validando password - Sistema ocupado");
+                System.out.println(" Timeout validando password - Sistema ocupado");
             } else {
-                System.out.println("⚠️ Error en validatePassword: " + e.getMessage());
+                System.out.println(" Error en validatePassword: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -279,9 +278,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             // ✅ Sin error en rojo
             if (e.getMessage().contains("Timeout")) {
-                System.out.println("⏳ Timeout obteniendo usuario - Sistema ocupado");
+                System.out.println(" Timeout obteniendo usuario - Sistema ocupado");
             } else {
-                System.out.println("⚠️ Error en getUserByUsername: " + e.getMessage());
+                System.out.println(" Error en getUserByUsername: " + e.getMessage());
             }
         } finally {
             closeConnection();
@@ -324,8 +323,8 @@ public class ImplementsBD implements UserDAO {
 
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al actualizar el usuario");
-            e.printStackTrace();
+            System.out.println(" Error al actualizar el usuario");
+            
         } finally {
             closeConnection();
         }
@@ -370,8 +369,8 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Error al obtener todos los usuarios");
-            e.printStackTrace();
+            System.out.println(" Error al obtener todos los usuarios");
+            
         }
 
         return usersMap;
@@ -416,8 +415,8 @@ public class ImplementsBD implements UserDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("❌ Error comprobando si el usuario es administrador");
-            e.printStackTrace();
+            System.out.println(" Error comprobando si el usuario es administrador");
+            
         }
 
         return admin;
@@ -433,7 +432,7 @@ public class ImplementsBD implements UserDAO {
             }
         } catch (SQLException e) {
             System.out.println("Error al cerrar la conexión");
-            e.printStackTrace();
+            
         }
     }
 }

@@ -9,6 +9,8 @@ import controller.Controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import Exception.ErrorException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,9 +26,12 @@ import javafx.stage.Stage;
 import model.User_;
 
 /**
- * FXML Controller class
- *
- * @author pablo
+ * Controlador para la ventana de inicio de sesión.
+ * Maneja la autenticación de usuarios, redireccionando a diferentes vistas
+ * según el tipo de usuario (administrador o usuario normal).
+ * 
+ * @author pikain
+ * @version 1.0
  */
 public class LoginWindowController implements Initializable {
 
@@ -51,10 +56,17 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Label msgLabel;
 
-    
     private Controller con = new Controller();
+
     /**
      * Initializes the controller class.
+     * Configura los listeners para habilitar/deshabilitar el botón de login
+     * según si los campos están completos.
+     * 
+     * @param url The location used to resolve relative paths for the root object,
+     *            or null if the location is not known.
+     * @param rb  The resources used to localize the root object, or null if the
+     *            root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -65,105 +77,126 @@ public class LoginWindowController implements Initializable {
         passwordField.textProperty().addListener((obs, oldV, newV) -> checkFields());
     }
 
+    /**
+     * Verifica si ambos campos (usuario y contraseña) están completos
+     * y habilita o deshabilita el botón de login en consecuencia.
+     */
     private void checkFields() {
         boolean filled = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
         loginBtn.setDisable(!filled);
-    } 
+    }
 
-    
-@FXML
+    /**
+     * Maneja el evento de inicio de sesión.
+     * Verifica si el usuario existe y si la contraseña es correcta.
+     * Si el usuario es administrador, redirige a la ventana de administrador.
+     * Si el usuario es normal, redirige a la ventana de modificación de perfil.
+     * 
+     */
+    @FXML
     private void onLogin() {
-        String username= usernameField.getText();
+
+        String username = usernameField.getText();
         boolean existe = con.existUser(username);
-        if (!existe){
-            showError("No existe el usuario");
-                    
-        }
-        else{
-            String password= passwordField.getText();
-            boolean valido = con.validatePassword(username, password);
-            if (valido){
-                showSuccess("USUARIO ENCONTRADO");
-                System.out.println("encontrado");
-                boolean isAdmin = con.isAdmin(username);
-                
-                
-                try {
-                    FXMLLoader loader;
-                    Parent root;
-                    Stage stage = new Stage();
+        try {
+            if (!existe) {
+                throw new ErrorException("No existe el usuario", "No existe el usuario");
 
-                    if (isAdmin) {
-                        // 🔸 Si es admin, cargar AdminView.fxml
-                        loader = new FXMLLoader(getClass().getResource("AdminView.fxml"));
-                        root = loader.load();
+            } else {
+                String password = passwordField.getText();
+                boolean valido = con.validatePassword(username, password);
+                if (valido) {
+                    showSuccess("USUARIO ENCONTRADO");
+                    System.out.println("encontrado");
+                    boolean isAdmin = con.isAdmin(username);
 
-                       
-                        stage.setTitle("Panel de Administración");
-                    } else {
-                        // 🔹 Si es usuario normal, cargar ModifyWindow.fxml
-                        loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
-                        root = loader.load();
+                    try {
+                        FXMLLoader loader;
+                        Parent root;
+                        Stage stage = new Stage();
 
-                        ModifyWindowController modifyController = loader.getController();
-                        User_ user = con.getUserByUsername(usernameField.getText());
-                        modifyController.setUser(user);
+                        if (isAdmin) {
+                            // 🔸 Si es admin, cargar AdminView.fxml
+                            loader = new FXMLLoader(getClass().getResource("AdminView.fxml"));
+                            root = loader.load();
 
-                        stage.setTitle("Modificar perfil");
+                            stage.setTitle("Panel de Administración");
+                        } else {
+                            // 🔹 Si es usuario normal, cargar ModifyWindow.fxml
+                            loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
+                            root = loader.load();
+
+                            ModifyWindowController modifyController = loader.getController();
+                            User_ user = con.getUserByUsername(usernameField.getText());
+                            modifyController.setUser(user);
+
+                            stage.setTitle("Modificar perfil");
+                        }
+
+                        stage.setScene(new Scene(root));
+                        stage.setResizable(false);
+                        stage.show();
+
+                        // Cerrar la ventana de login
+                        Stage currentStage = (Stage) signupBtn.getScene().getWindow();
+                        currentStage.close();
+
+                    } catch (IOException e) {
+                        throw new ErrorException("Error al abrir la ventana correspondiente.",
+                                "No se pudo abrir la ventana correspondiente.");
                     }
-
-                    stage.setScene(new Scene(root));
-                    stage.setResizable(false);
-                    stage.show();
-
-                    // Cerrar la ventana de login
-                    Stage currentStage = (Stage) signupBtn.getScene().getWindow();
-                    currentStage.close();
-
-                } catch (IOException e) {
-                    showError("No se pudo abrir la ventana correspondiente.");
+                    clearFields();
+                } else {
+                    throw new ErrorException("USUARIO NO ENCONTRADO", "USUARIO NO ENCONTRADO");
                 }
-                clearFields();
             }
-            else{
-                showSuccess("USUARIO NO ENCONTRADO");
-                clearFields();
-            }
+        } catch (ErrorException e) {
+            clearFields();
         }
     }
+
+    /**
+     * Maneja el evento de registro de nuevo usuario.
+     * Abre la ventana de registro y cierra la ventana actual de login.
+     * 
+     */
     @FXML
     private void onSignUp() {
         try {
-            // Cargar el FXML de la ventana de registro
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("SignUp.fxml"));
-            Parent root = loader.load();
+            try {
+                // Cargar el FXML de la ventana de registro
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("SignUp.fxml"));
+                Parent root = loader.load();
 
-            // Crear nueva escena y ventana (Stage)
-            Stage stage = new Stage();
-            stage.setTitle("Registro de usuario");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
+                // Crear nueva escena y ventana (Stage)
+                Stage stage = new Stage();
+                stage.setTitle("Registro de usuario");
+                stage.setScene(new Scene(root));
+                stage.setResizable(false);
 
-            // Mostrar la nueva ventana
-            stage.show();
+                // Mostrar la nueva ventana
+                stage.show();
 
-            // Cerrar la actual (opcional)
-            Stage currentStage = (Stage) signupBtn.getScene().getWindow();
-            currentStage.close();
+                // Cerrar la actual (opcional)
+                Stage currentStage = (Stage) signupBtn.getScene().getWindow();
+                currentStage.close();
 
-        } catch (IOException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new ErrorException("Error al abrir la ventana de registro.",
+                        "No se pudo abrir la ventana de registro.");
+            }
+        } catch (ErrorException e) {
             e.printStackTrace();
-            showError("No se pudo abrir la ventana de registro.");
         }
-    }
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+
     }
 
+    /**
+     * Muestra un mensaje de éxito o información al usuario.
+     * 
+     * @param msg El mensaje de éxito a mostrar
+     */
     private void showSuccess(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Login correcto");
@@ -171,9 +204,13 @@ public class LoginWindowController implements Initializable {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-    private void clearFields(){
+
+    /**
+     * Limpia los campos de usuario y contraseña.
+     */
+    private void clearFields() {
         usernameField.setText("");
         passwordField.setText("");
     }
-    
+
 }

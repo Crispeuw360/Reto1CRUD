@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import Exception.ErrorException;
 import controller.Controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,7 +64,7 @@ public class DropOutController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        
     }
 
     /**
@@ -83,38 +84,44 @@ public class DropOutController implements Initializable {
     @FXML
     private void onDelete(ActionEvent event) {
         User_ user = con.getUserByUsername(usernameField.getText());
-        boolean ok = con.deleteUser(user.getUser_name(),user.getUser_code());
-        if (ok) {
-            showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
-            exitBtn.setDisable(false);
-            try {
-                // Cargar el FXML de la ventana de login
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
-                Parent root = loader.load();
+        try {
+            if (passwordField.getText().equals(user.getPasswd())
+                    && passwordConfirmField.getText().equals(user.getPasswd())) {
+                boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+                if (ok) {
+                    showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+                    exitBtn.setDisable(false);
+                    try {
+                        // Cargar el FXML de la ventana de login
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
+                        Parent root = loader.load();
 
-                
+                        // Crear la escena y ventana (Stage)
+                        Stage stage = new Stage();
+                        stage.setTitle("Iniciar Sesión");
+                        stage.setScene(new Scene(root));
+                        stage.setResizable(false);
+                        stage.show();
 
-                // Crear la escena y ventana (Stage)
-                Stage stage = new Stage();
-                stage.setTitle("Iniciar Sesión");
-                stage.setScene(new Scene(root));
-                stage.setResizable(false);
-                stage.show();
+                        // Cerrar la ventana actual
+                        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        currentStage.close();
 
-                // Cerrar la ventana actual
-                Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                currentStage.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error al volver");
-                alert.setHeaderText(null);
-                alert.setContentText("No se pudo abrir la ventana de login.");
-                alert.showAndWait();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error al volver");
+                        alert.setHeaderText(null);
+                        alert.setContentText("No se pudo abrir la ventana de login.");
+                        alert.showAndWait();
+                    }
+                } else {
+                    throw new ErrorException("Error al eliminar el usuario.", "Error al eliminar el usuario.");
+                }
+            } else {
+                throw new ErrorException("Las contraseñas no son correctas.", "Las contraseñas no son correctas.");
             }
-        } else {
-            showAlert("Error al eliminar el usuario.", Alert.AlertType.ERROR);
+        } catch (ErrorException e) {
         }
     }
 
@@ -146,7 +153,6 @@ public class DropOutController implements Initializable {
             currentStage.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error al volver");
             alert.setHeaderText(null);

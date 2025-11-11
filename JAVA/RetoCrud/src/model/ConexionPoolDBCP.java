@@ -43,7 +43,7 @@ public class ConexionPoolDBCP {
         dataSource.setMaxTotal(MAX_CONCURRENT_CONNECTIONS);
         dataSource.setMinIdle(1);
         dataSource.setMaxIdle(MAX_CONCURRENT_CONNECTIONS);
-        dataSource.setMaxWaitMillis(10000); // 10 segundos
+        dataSource.setMaxWaitMillis(5000); // 5 segundos
 
         // Configuraciones adicionales para evitar problemas
         dataSource.setValidationQuery("SELECT 1");
@@ -52,28 +52,27 @@ public class ConexionPoolDBCP {
         dataSource.setTestWhileIdle(true);
         dataSource.setTimeBetweenEvictionRunsMillis(30000);
         
-        System.out.println("✅ Pool configurado con " + MAX_CONCURRENT_CONNECTIONS + " conexiones máximas");
+        System.out.println(" Pool configurado con " + MAX_CONCURRENT_CONNECTIONS + " conexiones máximas");
     }
 
     /*
      * Método para obtener una conexión con limitación utilizando la libreria Semaphore
      * 
      * @return una conexión de la base de datos
-     * @throws SQLException si ocurre un error al obtener la conexión
      */
-    public static Connection getConnection() throws SQLException {
+    public static Connection getConnection() {
         try {
-            // ✅ VERIFICAR Y RESETEAR PRIMERO
+            // VERIFICAR Y RESETEAR PRIMERO
             checkAndResetSemaphore();
             
             int availableBefore = connectionSemaphore.availablePermits();
-            System.out.println("🎫 Intentando conexión. Disponibles: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS + 
+            System.out.println(" Intentando conexión. Disponibles: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS + 
                              " - Tiempo desde reset: " + (System.currentTimeMillis() - lastResetTime.get()) + "ms");
             
             // Intentar adquirir un permiso (timeout de 10 segundos)
             if (connectionSemaphore.tryAcquire(10, TimeUnit.SECONDS)) {
                 int availableAfter = connectionSemaphore.availablePermits();
-                System.out.println("✅ Conexión adquirida. Restantes: " + availableAfter + "/" + MAX_CONCURRENT_CONNECTIONS);
+                System.out.println(" Conexión adquirida. Restantes: " + availableAfter + "/" + MAX_CONCURRENT_CONNECTIONS);
                 
                 // Obtener la conexión real del pool
                 Connection conn = dataSource.getConnection();
@@ -85,9 +84,9 @@ public class ConexionPoolDBCP {
                     throw new SQLException("Conexión nula o cerrada obtenida del pool");
                 }
             } else {
-                // ✅ VERIFICAR SI ES MOMENTO DE RESET
+                // VERIFICAR SI ES MOMENTO DE RESET
                 checkAndResetSemaphore();
-                System.out.println("❌ TIMEOUT - Estado: " + getSemaphoreStatus());
+                System.out.println(" TIMEOUT - Estado: " + getSemaphoreStatus());
                 throw new SQLException("Timeout: No se pudo obtener conexión. " + getSemaphoreStatus());
             }
         } catch (InterruptedException e) {
@@ -98,8 +97,6 @@ public class ConexionPoolDBCP {
     
     /*
      * Método para verificar y resetear el semáforo
-     * 
-     * @throws SQLException si ocurre un error al verificar el semáforo
      */
     private static void checkAndResetSemaphore() {
         long currentTime = System.currentTimeMillis();
@@ -112,7 +109,7 @@ public class ConexionPoolDBCP {
                 int drained = connectionSemaphore.drainPermits();
                 connectionSemaphore.release(MAX_CONCURRENT_CONNECTIONS);
                 
-                System.out.println("🔄 🔄 🔄 RESET AUTOMÁTICO - " + drained + " permisos drenados, " + 
+                System.out.println(" RESET AUTOMÁTICO - " + drained + " permisos drenados, " + 
                                  MAX_CONCURRENT_CONNECTIONS + " liberados. Tiempo: " + (currentTime - lastReset) + "ms");
             }
         }
@@ -120,8 +117,6 @@ public class ConexionPoolDBCP {
     
     /*
      * Método para liberar una conexión
-     * 
-     * @throws SQLException si ocurre un error al liberar la conexión
      */
     public static void releaseConnection() {
         int availableBefore = connectionSemaphore.availablePermits();
@@ -129,9 +124,9 @@ public class ConexionPoolDBCP {
         // VERIFICAR ANTES DE LIBERAR
         if (availableBefore < MAX_CONCURRENT_CONNECTIONS) {
             connectionSemaphore.release();
-            System.out.println("🔓 Conexión liberada. Disponibles: " + (availableBefore + 1) + "/" + MAX_CONCURRENT_CONNECTIONS);
+            System.out.println(" Conexión liberada. Disponibles: " + (availableBefore + 1) + "/" + MAX_CONCURRENT_CONNECTIONS);
         } else {
-            System.out.println("⚠️  Intento de liberar conexión cuando ya hay máximo disponible: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS);
+            System.out.println(" Intento de liberar conexión cuando ya hay máximo disponible: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS);
         }
         
         // VERIFICAR SI ES MOMENTO DE RESET después de liberar
@@ -147,7 +142,7 @@ public class ConexionPoolDBCP {
         long timeSinceReset = System.currentTimeMillis() - lastResetTime.get();
         return "Conexiones disponibles: " + connectionSemaphore.availablePermits() + 
                "/" + MAX_CONCURRENT_CONNECTIONS + " - Tiempo desde último reset: " + 
-               timeSinceReset + "ms" + (timeSinceReset > RESET_INTERVAL ? " ⚠️ (RESET PENDIENTE)" : "");
+               timeSinceReset + "ms" + (timeSinceReset > RESET_INTERVAL ? " (RESET PENDIENTE)" : "");
     }
     
     /*

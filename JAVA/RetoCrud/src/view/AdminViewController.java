@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import Exception.ErrorException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -177,62 +179,64 @@ public class AdminViewController implements Initializable {
      */
     @FXML
     private void onRegister(ActionEvent event) {
-        // Comprobamos que todos los campos estén completos
-        if (fieldUser.getText().isEmpty() ||
-                fieldName.getText().isEmpty() ||
-                fieldSurname.getText().isEmpty() ||
-                fieldGmail.getText().isEmpty() ||
-                fieldTel.getText().isEmpty() ||
-                fieldPass.getText().isEmpty() ||
-                fieldPass2.getText().isEmpty() ||
-                fieldCard.getText().isEmpty() ||
-                comboGender.getValue() == null) {
-
-            showAlert("Por favor, rellena todos los campos.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos que las contraseñas coinciden
-        if (!fieldPass.getText().equals(fieldPass2.getText())) {
-            showAlert("Las contraseñas no coinciden.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos formato del correo
-        if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showAlert("Correo electrónico no válido.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos que teléfono y tarjeta son números
-        int tel, card;
         try {
-            tel = Integer.parseInt(fieldTel.getText());
-            card = Integer.parseInt(fieldCard.getText());
-        } catch (NumberFormatException e) {
-            showAlert("Teléfono o número de tarjeta inválidos (deben ser numéricos).", Alert.AlertType.ERROR);
-            return;
-        }
+            // Comprobamos que todos los campos estén completos
+            if (fieldUser.getText().isEmpty() ||
+                    fieldName.getText().isEmpty() ||
+                    fieldSurname.getText().isEmpty() ||
+                    fieldGmail.getText().isEmpty() ||
+                    fieldTel.getText().isEmpty() ||
+                    fieldPass.getText().isEmpty() ||
+                    fieldPass2.getText().isEmpty() ||
+                    fieldCard.getText().isEmpty() ||
+                    comboGender.getValue() == null) {
 
-        // Si todo es correcto → actualizamos el objeto y llamamos a BD
-        user.setUser_name(fieldUser.getText());
-        user.setName_(fieldName.getText());
-        user.setSurname(fieldSurname.getText());
-        user.setEmail(fieldGmail.getText());
-        user.setTelephone(tel);
-        user.setCard_no(card);
-        user.setGender(comboGender.getValue());
-        user.setPasswd(fieldPass.getText());
+                throw new ErrorException("Por favor, rellena todos los campos.",
+                        "Por favor, rellena todos los campos.");
+            }
 
-        boolean ok = con.updateUser(user);
+            // Comprobamos que las contraseñas coinciden
+            if (!fieldPass.getText().equals(fieldPass2.getText())) {
+                throw new ErrorException("Las contraseñas no coinciden.", "Las contraseñas no coinciden.");
+            }
 
-        if (ok) {
-            showAlert("Usuario actualizado correctamente.", Alert.AlertType.INFORMATION);
-            btnSave.setDisable(true);
-            btnModify.setDisable(false);
-            setEditableFields(false);
-        } else {
-            showAlert("Error al actualizar el usuario.", Alert.AlertType.ERROR);
+            // Comprobamos formato del correo
+            if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                throw new ErrorException("Correo electrónico no válido.", "Correo electrónico no válido.");
+            }
+
+            // Comprobamos que teléfono y tarjeta son números
+            int tel, card;
+            try {
+                tel = Integer.parseInt(fieldTel.getText());
+                card = Integer.parseInt(fieldCard.getText());
+            } catch (NumberFormatException e) {
+                throw new ErrorException("Teléfono o número de tarjeta inválidos (deben ser numéricos).",
+                        "Teléfono o número de tarjeta inválidos (deben ser numéricos).");
+            }
+
+            // Si todo es correcto → actualizamos el objeto y llamamos a BD
+            user.setUser_name(fieldUser.getText());
+            user.setName_(fieldName.getText());
+            user.setSurname(fieldSurname.getText());
+            user.setEmail(fieldGmail.getText());
+            user.setTelephone(tel);
+            user.setCard_no(card);
+            user.setGender(comboGender.getValue());
+            user.setPasswd(fieldPass.getText());
+
+            boolean ok = con.updateUser(user);
+
+            if (ok) {
+                showAlert("Usuario actualizado correctamente.", Alert.AlertType.INFORMATION);
+                btnSave.setDisable(true);
+                btnModify.setDisable(false);
+                setEditableFields(false);
+            } else {
+                throw new ErrorException("Error al actualizar el usuario.", "Error al actualizar el usuario.");
+            }
+        } catch (ErrorException e) {
+
         }
     }
 
@@ -262,11 +266,11 @@ public class AdminViewController implements Initializable {
         fieldSurname.setEditable(editable);
         fieldTel.setEditable(editable);
         fieldCard.setEditable(editable);
-        comboGender.setDisable(!editable); // 👈 este es el truco
+        comboGender.setDisable(!editable);
         fieldPass.setEditable(editable);
         fieldPass2.setEditable(editable);
     }
-    
+
     /**
      * Maneja el evento de eliminar un usuario.
      * 
@@ -274,29 +278,32 @@ public class AdminViewController implements Initializable {
      */
     @FXML
     private void onDelete(ActionEvent event) {
-        String selectedUsername = comboUsers.getValue();
-        if (selectedUsername == null || selectedUsername.isEmpty()) {
-            showAlert("Por favor, selecciona un usuario para eliminar.", Alert.AlertType.ERROR);
-            return;
-        }
+        try {
+            String selectedUsername = comboUsers.getValue();
+            if (selectedUsername == null || selectedUsername.isEmpty()) {
+                throw new ErrorException("Por favor, selecciona un usuario para eliminar.",
+                        "Por favor, selecciona un usuario para eliminar.");
+            }
 
-        User_ user = users.get(selectedUsername); // ✅ Use username from combo box
-        if (user == null) {
-            showAlert("Usuario no encontrado.", Alert.AlertType.ERROR);
-            return;
-        }
+            User_ user = users.get(selectedUsername);
+            if (user == null) {
+                throw new ErrorException("Usuario no encontrado.", "Usuario no encontrado.");
+            }
 
-        boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
-        if (ok) {
-            showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
-            comboUsers.getItems().remove(user.getUser_name());
-            users.remove(user.getUser_name()); // Also remove from local map
-            clearFields();
-            setEditableFields(false);
-            btnSave.setDisable(true);
-            btnModify.setDisable(true);
-        } else {
-            showAlert("Error al eliminar el usuario.", Alert.AlertType.ERROR);
+            boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+            if (ok) {
+                showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+                comboUsers.getItems().remove(user.getUser_name());
+                users.remove(user.getUser_name());
+                clearFields();
+                setEditableFields(false);
+                btnSave.setDisable(true);
+                btnModify.setDisable(true);
+            } else {
+                throw new ErrorException("Error al eliminar el usuario.", "Error al eliminar el usuario.");
+            }
+        } catch (ErrorException e) {
+            showAlert(e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

@@ -24,11 +24,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.User_;
+import Exception.ErrorException;
 
 /**
- * FXML Controller class
- *
- * @author pablo
+ * Controlador para la ventana de modificación de perfil de usuario.
+ * Permite a los usuarios visualizar y modificar sus datos personales,
+ * incluyendo información básica, credenciales y datos de contacto.
+ * 
+ * @author pikain
+ * @version 1.0
  */
 public class ModifyWindowController implements Initializable {
 
@@ -85,6 +89,13 @@ public class ModifyWindowController implements Initializable {
 
     /**
      * Initializes the controller class.
+     * Configura los valores iniciales del ComboBox de género y establece
+     * el estado inicial de los componentes de la interfaz.
+     * 
+     * @param url The location used to resolve relative paths for the root object,
+     *            or null if the location is not known.
+     * @param rb  The resources used to localize the root object, or null if the
+     *            root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -97,6 +108,13 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
+    /**
+     * Establece el usuario actual y carga sus datos en los campos correspondientes.
+     * Inicializa la interfaz con la información del usuario y configura el estado
+     * inicial de los campos como no editables.
+     * 
+     * @param user El usuario cuyos datos se mostrarán en la interfaz
+     */
     public void setUser(User_ user) {
         this.currentUser = user;
 
@@ -117,6 +135,12 @@ public class ModifyWindowController implements Initializable {
 
     }
 
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cierra la ventana actual de modificación y abre la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onBack(ActionEvent event) {
         try {
@@ -136,7 +160,6 @@ public class ModifyWindowController implements Initializable {
             currentStage.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error al volver");
             alert.setHeaderText(null);
@@ -145,6 +168,12 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Modificar".
+     * Permite editar los campos de la interfaz y habilita el botón de guardar.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onModify(ActionEvent event) {
         setEditableFields(true);
@@ -153,67 +182,82 @@ public class ModifyWindowController implements Initializable {
         userLabel.setDisable(true);
     }
 
+    /**
+     * Maneja el evento del botón "Registrar/Guardar".
+     * Valida los datos ingresados y actualiza el usuario en la base de datos
+     * si todas las validaciones son exitosas.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     * 
+     */
     @FXML
     private void onRegister(ActionEvent event) {
-        // Comprobamos que todos los campos estén completos
-        if (fieldUser.getText().isEmpty() ||
-                fieldName.getText().isEmpty() ||
-                fieldSurname.getText().isEmpty() ||
-                fieldGmail.getText().isEmpty() ||
-                fieldTel.getText().isEmpty() ||
-                fieldPass.getText().isEmpty() ||
-                fieldPass2.getText().isEmpty() ||
-                fieldCard.getText().isEmpty() ||
-                comboGender.getValue() == null) {
-
-            showAlert("Por favor, rellena todos los campos.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos que las contraseñas coinciden
-        if (!fieldPass.getText().equals(fieldPass2.getText())) {
-            showAlert("Las contraseñas no coinciden.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos formato del correo
-        if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showAlert("Correo electrónico no válido.", Alert.AlertType.ERROR);
-            return;
-        }
-
-        // Comprobamos que teléfono y tarjeta son números
-        int tel, card;
         try {
-            tel = Integer.parseInt(fieldTel.getText());
-            card = Integer.parseInt(fieldCard.getText());
-        } catch (NumberFormatException e) {
-            showAlert("Teléfono o número de tarjeta inválidos (deben ser numéricos).", Alert.AlertType.ERROR);
-            return;
-        }
+            // Comprobamos que todos los campos estén completos
+            if (fieldUser.getText().isEmpty() ||
+                    fieldName.getText().isEmpty() ||
+                    fieldSurname.getText().isEmpty() ||
+                    fieldGmail.getText().isEmpty() ||
+                    fieldTel.getText().isEmpty() ||
+                    fieldPass.getText().isEmpty() ||
+                    fieldPass2.getText().isEmpty() ||
+                    fieldCard.getText().isEmpty() ||
+                    comboGender.getValue() == null) {
 
-        // Si todo es correcto → actualizamos el objeto y llamamos a BD
-        currentUser.setUser_name(fieldUser.getText());
-        currentUser.setName_(fieldName.getText());
-        currentUser.setSurname(fieldSurname.getText());
-        currentUser.setEmail(fieldGmail.getText());
-        currentUser.setTelephone(tel);
-        currentUser.setCard_no(card);
-        currentUser.setGender(comboGender.getValue());
-        currentUser.setPasswd(fieldPass.getText());
+                throw new ErrorException("Error al registrar", "Por favor, rellena todos los campos.");
+            }
 
-        boolean ok = con.updateUser(currentUser);
+            // Comprobamos que las contraseñas coinciden
+            if (!fieldPass.getText().equals(fieldPass2.getText())) {
+                throw new ErrorException("Error al registrar", "Las contraseñas no coinciden.");
+            }
 
-        if (ok) {
-            showAlert("Usuario actualizado correctamente.", Alert.AlertType.INFORMATION);
-            btnSave.setDisable(true);
-            btnModify.setDisable(false);
-            setEditableFields(false);
-        } else {
-            showAlert("Error al actualizar el usuario.", Alert.AlertType.ERROR);
+            // Comprobamos formato del correo
+            if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                throw new ErrorException("Error al registrar", "Correo electrónico no válido.");
+            }
+
+            // Comprobamos que teléfono y tarjeta son números
+            int tel, card;
+            try {
+                tel = Integer.parseInt(fieldTel.getText());
+                card = Integer.parseInt(fieldCard.getText());
+            } catch (NumberFormatException e) {
+                throw new ErrorException("Error al registrar",
+                        "Teléfono o número de tarjeta inválidos (deben ser numéricos).");
+            }
+
+            // Si todo es correcto → actualizamos el objeto y llamamos a BD
+            currentUser.setUser_name(fieldUser.getText());
+            currentUser.setName_(fieldName.getText());
+            currentUser.setSurname(fieldSurname.getText());
+            currentUser.setEmail(fieldGmail.getText());
+            currentUser.setTelephone(tel);
+            currentUser.setCard_no(card);
+            currentUser.setGender(comboGender.getValue());
+            currentUser.setPasswd(fieldPass.getText());
+
+            boolean ok = con.updateUser(currentUser);
+
+            if (ok) {
+                showAlert("Usuario actualizado correctamente.", Alert.AlertType.INFORMATION);
+                btnSave.setDisable(true);
+                btnModify.setDisable(false);
+                setEditableFields(false);
+            } else {
+                throw new ErrorException("Error al actualizar el usuario.", "Error al actualizar el usuario.");
+            }
+        } catch (ErrorException e) {
+
         }
     }
 
+    /**
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
+     * 
+     * @param msg  El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
@@ -221,6 +265,11 @@ public class ModifyWindowController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Configura la edicion de los campos de la interfaz.
+     * 
+     * @param editable Indica si los campos son editables o no
+     */
     private void setEditableFields(boolean editable) {
 
         fieldName.setEditable(editable);
@@ -233,6 +282,12 @@ public class ModifyWindowController implements Initializable {
         fieldPass2.setEditable(editable);
     }
 
+    /**
+     * Maneja el evento del botón "Mostrar Contraseña".
+     * Alterna entre mostrar y ocultar las contraseñas en texto plano.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void showPass(ActionEvent event) {
         passwordVisible = !passwordVisible;
@@ -254,6 +309,13 @@ public class ModifyWindowController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Eliminar".
+     * Abre la ventana de eliminación de usuario y cierra la ventana actual de
+     * modificación.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
     @FXML
     private void onDelete(ActionEvent event) {
         try {
@@ -276,7 +338,6 @@ public class ModifyWindowController implements Initializable {
             currentStage.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error al volver");
             alert.setHeaderText(null);
