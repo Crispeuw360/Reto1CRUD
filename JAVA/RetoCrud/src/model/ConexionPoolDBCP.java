@@ -14,7 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
- * @author 2dami
+ * @author PIKAIN
+ * 
+ * 
  */
 public class ConexionPoolDBCP {
     // Instancia única del pool
@@ -53,7 +55,12 @@ public class ConexionPoolDBCP {
         System.out.println("✅ Pool configurado con " + MAX_CONCURRENT_CONNECTIONS + " conexiones máximas");
     }
 
-    // Método para obtener una conexión con limitación - CORREGIDO
+    /*
+     * Método para obtener una conexión con limitación utilizando la libreria Semaphore
+     * 
+     * @return una conexión de la base de datos
+     * @throws SQLException si ocurre un error al obtener la conexión
+     */
     public static Connection getConnection() throws SQLException {
         try {
             // ✅ VERIFICAR Y RESETEAR PRIMERO
@@ -89,7 +96,11 @@ public class ConexionPoolDBCP {
         }
     }
     
-    // ✅ MÉTODO CORREGIDO: Reset efectivo cada 30 segundos
+    /*
+     * Método para verificar y resetear el semáforo
+     * 
+     * @throws SQLException si ocurre un error al verificar el semáforo
+     */
     private static void checkAndResetSemaphore() {
         long currentTime = System.currentTimeMillis();
         long lastReset = lastResetTime.get();
@@ -107,11 +118,15 @@ public class ConexionPoolDBCP {
         }
     }
     
-    // Método para liberar una conexión - CORREGIDO
+    /*
+     * Método para liberar una conexión
+     * 
+     * @throws SQLException si ocurre un error al liberar la conexión
+     */
     public static void releaseConnection() {
         int availableBefore = connectionSemaphore.availablePermits();
         
-        // ✅ VERIFICAR ANTES DE LIBERAR
+        // VERIFICAR ANTES DE LIBERAR
         if (availableBefore < MAX_CONCURRENT_CONNECTIONS) {
             connectionSemaphore.release();
             System.out.println("🔓 Conexión liberada. Disponibles: " + (availableBefore + 1) + "/" + MAX_CONCURRENT_CONNECTIONS);
@@ -119,11 +134,15 @@ public class ConexionPoolDBCP {
             System.out.println("⚠️  Intento de liberar conexión cuando ya hay máximo disponible: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS);
         }
         
-        // ✅ VERIFICAR SI ES MOMENTO DE RESET después de liberar
+        // VERIFICAR SI ES MOMENTO DE RESET después de liberar
         checkAndResetSemaphore();
     }
 
-    // Método para verificar el estado del semáforo
+    /*
+     * Método para verificar el estado del semáforo
+     * 
+     * @return el estado del semáforo
+     */
     public static String getSemaphoreStatus() {
         long timeSinceReset = System.currentTimeMillis() - lastResetTime.get();
         return "Conexiones disponibles: " + connectionSemaphore.availablePermits() + 
@@ -131,14 +150,29 @@ public class ConexionPoolDBCP {
                timeSinceReset + "ms" + (timeSinceReset > RESET_INTERVAL ? " ⚠️ (RESET PENDIENTE)" : "");
     }
     
+    /*
+     * Método para obtener el número máximo de conexiones
+     * 
+     * @return el número máximo de conexiones
+     */
     public static int getMaxConnections() {
         return MAX_CONCURRENT_CONNECTIONS;
     }
     
+    /*
+     * Método para obtener el número de conexiones disponibles
+     * 
+     * @return el número de conexiones disponibles
+     */
     public static int getAvailableConnections() {
         return connectionSemaphore.availablePermits();
     }
     
+    /*
+     * Método para obtener el tiempo desde el último reset
+     * 
+     * @return el tiempo desde el último reset
+     */
     public static long getTimeSinceLastReset() {
         return System.currentTimeMillis() - lastResetTime.get();
     }
