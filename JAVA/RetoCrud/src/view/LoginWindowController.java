@@ -42,7 +42,7 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Label label;
     @FXML
-    private PasswordField passwordField;
+     PasswordField passwordField;
     @FXML
     private TextField usernameField;
     @FXML
@@ -81,7 +81,7 @@ public class LoginWindowController implements Initializable {
      * Verifica si ambos campos (usuario y contraseña) están completos
      * y habilita o deshabilita el botón de login en consecuencia.
      */
-    private void checkFields() {
+    public void checkFields() {
         boolean filled = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
         loginBtn.setDisable(!filled);
     }
@@ -94,7 +94,7 @@ public class LoginWindowController implements Initializable {
      * 
      */
     @FXML
-    private void onLogin() {
+    public void onLogin() {
 
         String username = usernameField.getText();
         boolean existe = con.existUser(username);
@@ -161,7 +161,7 @@ public class LoginWindowController implements Initializable {
      * 
      */
     @FXML
-    private void onSignUp() {
+    public void onSignUp() {
         try {
             try {
                 // Cargar el FXML de la ventana de registro

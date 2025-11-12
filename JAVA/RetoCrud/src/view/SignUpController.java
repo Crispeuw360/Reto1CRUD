@@ -201,7 +201,7 @@ public class SignUpController implements Initializable {
      * Cierra la ventana actual de registro y abre la ventana de login
      */
     @FXML
-    private void onBack() {
+    public void onBack() {
         System.out.println("Back");
         try {
             // Cargar el FXML de la ventana de registro

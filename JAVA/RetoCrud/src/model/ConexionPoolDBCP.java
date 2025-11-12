@@ -23,7 +23,7 @@ public class ConexionPoolDBCP {
     private static BasicDataSource dataSource;
     
     // VARIABLE CONFIGURABLE para el número de permisos
-    private static final int MAX_CONCURRENT_CONNECTIONS = 6;
+    private static final int MAX_CONCURRENT_CONNECTIONS = 20;
     
     // Semáforo configurable - CORREGIDO
     private static final Semaphore connectionSemaphore = new Semaphore(MAX_CONCURRENT_CONNECTIONS, true);
@@ -60,7 +60,7 @@ public class ConexionPoolDBCP {
      * 
      * @return una conexión de la base de datos
      */
-    public static Connection getConnection() {
+    public static Connection getConnection() throws SQLException {
         try {
             // VERIFICAR Y RESETEAR PRIMERO
             checkAndResetSemaphore();
