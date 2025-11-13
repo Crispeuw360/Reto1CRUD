@@ -1,0 +1,177 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package view;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import Exception.ErrorException;
+import controller.Controller;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
+import model.User_;
+
+/**
+ * FXML Controller class
+ *
+ * @author PIKAIN
+ */
+public class DropOutController implements Initializable {
+
+    @FXML
+    private Button ConfirmBtn;
+    @FXML
+    private Label label;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private Circle avatarIcon;
+    @FXML
+    private Label usernameLabel;
+    @FXML
+    private Label passwordLabel;
+    @FXML
+    private Label passwordConfirmLabel;
+    @FXML
+    private PasswordField passwordConfirmField;
+    @FXML
+    private Label deleteLabel;
+    @FXML
+    private Button exitBtn;
+    private Controller con = new Controller();
+
+    /**
+     * Initializes the controller class.
+     * 
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        
+    }
+
+    /**
+     * Establece el nombre de usuario en el campo de texto.
+     * 
+     * @param username Nombre de usuario a establecer.
+     */
+    public void setUsername(String username) {
+        this.usernameField.setText(username);
+    }
+
+    /**
+     * Maneja el evento de eliminar un usuario.
+     * 
+     * @param event Evento de acción.
+     */
+    @FXML
+    private void onDelete(ActionEvent event) {
+        User_ user = con.getUserByUsername(usernameField.getText());
+        try {
+            if (passwordField.getText().equals(user.getPasswd())
+                    && passwordConfirmField.getText().equals(user.getPasswd())) {
+                boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
+                if (ok) {
+                    showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+                    exitBtn.setDisable(false);
+                    try {
+                        // Cargar el FXML de la ventana de login
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
+                        Parent root = loader.load();
+
+                        // Crear la escena y ventana (Stage)
+                        Stage stage = new Stage();
+                        stage.setTitle("Iniciar Sesión");
+                        stage.setScene(new Scene(root));
+                        stage.setResizable(false);
+                        stage.show();
+
+                        // Cerrar la ventana actual
+                        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        currentStage.close();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error al volver");
+                        alert.setHeaderText(null);
+                        alert.setContentText("No se pudo abrir la ventana de login.");
+                        alert.showAndWait();
+                    }
+                } else {
+                    throw new ErrorException("Error al eliminar el usuario.", "Error al eliminar el usuario.");
+                }
+            } else {
+                throw new ErrorException("Las contraseñas no son correctas.", "Las contraseñas no son correctas.");
+            }
+        } catch (ErrorException e) {
+        }
+    }
+
+    /**
+     * Maneja el evento de volver a la ventana de modificación.
+     * 
+     * @param event Evento de acción.
+     */
+    @FXML
+    private void OnBack(ActionEvent event) {
+        try {
+            // Cargar el FXML de la ventana de login
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ModifyWindow.fxml"));
+            Parent root = loader.load();
+
+            ModifyWindowController modifyController = loader.getController();
+            User_ user = con.getUserByUsername(usernameField.getText());
+            modifyController.setUser(user);
+
+            // Crear la escena y ventana (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("Iniciar Sesión");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.show();
+
+            // Cerrar la ventana actual
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error al volver");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo abrir la ventana de login.");
+            alert.showAndWait();
+        }
+    }
+
+    /**
+     * Muestra una alerta con el mensaje y el tipo especificados.
+     * 
+     * @param msg  Mensaje a mostrar en la alerta.
+     * @param type Tipo de alerta (INFORMATION, ERROR, etc.).
+     */
+    private void showAlert(String msg, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+
+}

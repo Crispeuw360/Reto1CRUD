@@ -1,13 +1,14 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package view;
 
 import controller.Controller;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
-
-import Exception.ErrorException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,11 +24,18 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.User_;
+import Exception.ErrorException;
 
-public class AdminViewController implements Initializable {
+/**
+ * Controlador para la ventana de modificación de perfil de usuario.
+ * Permite a los usuarios visualizar y modificar sus datos personales,
+ * incluyendo información básica, credenciales y datos de contacto.
+ * 
+ * @author pikain
+ * @version 1.0
+ */
+public class ModifyWindowController implements Initializable {
 
-    @FXML
-    private ComboBox<String> comboUsers;
     @FXML
     private Button btnBack;
     @FXML
@@ -73,71 +81,71 @@ public class AdminViewController implements Initializable {
     @FXML
     private Button btnSave;
 
-    private User_ user;
-    private Map<String, User_> users = new HashMap<>();
-    private boolean passwordVisible = false;
     private Controller con = new Controller();
+    private boolean passwordVisible = false;
+    private User_ currentUser;
     @FXML
     private Button btnDelete;
 
     /**
-     * Inicializa la vista del administrador.
+     * Initializes the controller class.
+     * Configura los valores iniciales del ComboBox de género y establece
+     * el estado inicial de los componentes de la interfaz.
      * 
-     * @param url URL del archivo FXML.
-     * @param rb  Recursos del archivo FXML.
+     * @param url The location used to resolve relative paths for the root object,
+     *            or null if the location is not known.
+     * @param rb  The resources used to localize the root object, or null if the
+     *            root object was not localized.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Cargar todos los usuarios desde la BD
-        users = con.getAllUsers();
+        // TODO
 
-        // Rellenar el ComboBox con sus usernames
-        comboUsers.getItems().clear();
-        comboUsers.getItems().addAll(users.keySet());
-        setEditableFields(false);
-
-        btnSave.setDisable(true);
-        btnModify.setDisable(true);
-        fieldUser.setEditable(false);
-
-        // Detectar cuando el usuario cambia la selección
-        comboUsers.setOnAction(e -> onUserSelected());
-    }
-
-    /**
-     * Maneja el evento de selección de un usuario.
-     */
-    private void onUserSelected() {
-        String selectedUsername = comboUsers.getValue();
-        if (selectedUsername != null) {
-            user = users.get(selectedUsername);
-            if (user != null) {
-                fieldUser.setText(user.getUser_name());
-                fieldName.setText(user.getName_());
-                fieldSurname.setText(user.getSurname());
-                fieldGmail.setText(user.getEmail());
-                fieldTel.setText(String.valueOf(user.getTelephone()));
-                fieldCard.setText(String.valueOf(user.getCard_no()));
-                fieldPass.setText(user.getPasswd());
-                fieldPass2.setText(user.getPasswd());
-                comboGender.setValue(user.getGender());
-                setEditableFields(false);
-                btnModify.setDisable(false);
-
-            }
+        if (comboGender != null) {
+            comboGender.getItems().clear(); // por si acaso
+            comboGender.getItems().addAll("Masculino", "Femenino", "Otro");
+            comboGender.setDisable(true); // bloqueado al inicio
         }
     }
 
     /**
-     * Maneja el evento de volver a la ventana de login.
+     * Establece el usuario actual y carga sus datos en los campos correspondientes.
+     * Inicializa la interfaz con la información del usuario y configura el estado
+     * inicial de los campos como no editables.
      * 
-     * @param event Evento de acción.
+     * @param user El usuario cuyos datos se mostrarán en la interfaz
+     */
+    public void setUser(User_ user) {
+        this.currentUser = user;
+
+        // Mostrar los datos en los TextFields
+        fieldName.setText(user.getName_());
+        fieldGmail.setText(user.getEmail());
+        fieldSurname.setText(user.getSurname());
+        fieldUser.setText(user.getUser_name());
+        fieldTel.setText(String.valueOf(user.getTelephone()));
+        fieldCard.setText(String.valueOf(user.getCard_no()));
+        fieldPass.setText(user.getPasswd());
+        fieldPass2.setText(user.getPasswd());
+        fieldUser.setText(user.getUser_name());
+        comboGender.setValue(user.getGender());
+        btnSave.setDisable(true);
+        fieldUser.setEditable(false);
+        setEditableFields(false);
+
+    }
+
+    /**
+     * Maneja el evento del botón "Volver".
+     * Cierra la ventana actual de modificación y abre la ventana de login.
+     * 
+     * @param event El evento de acción que desencadenó este método
      */
     @FXML
     private void onBack(ActionEvent event) {
         try {
             // Cargar el FXML de la ventana de login
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
             Parent root = loader.load();
 
             // Crear la escena y ventana (Stage)
@@ -152,7 +160,6 @@ public class AdminViewController implements Initializable {
             currentStage.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error al volver");
             alert.setHeaderText(null);
@@ -162,23 +169,26 @@ public class AdminViewController implements Initializable {
     }
 
     /**
-     * Maneja el evento de modificar un usuario.
+     * Maneja el evento del botón "Modificar".
+     * Permite editar los campos de la interfaz y habilita el botón de guardar.
      * 
-     * @param event Evento de acción.
+     * @param event El evento de acción que desencadenó este método
      */
     @FXML
     private void onModify(ActionEvent event) {
-        // implementar modificar
         setEditableFields(true);
-        comboGender.getItems().addAll("Male", "Female", "Other");
         btnSave.setDisable(false);
         btnModify.setDisable(true);
+        userLabel.setDisable(true);
     }
 
     /**
-     * Maneja el evento de registrar la modificación de un usuario.
+     * Maneja el evento del botón "Registrar/Guardar".
+     * Valida los datos ingresados y actualiza el usuario en la base de datos
+     * si todas las validaciones son exitosas.
      * 
-     * @param event Evento de acción.
+     * @param event El evento de acción que desencadenó este método
+     * 
      */
     @FXML
     private void onRegister(ActionEvent event) {
@@ -194,18 +204,17 @@ public class AdminViewController implements Initializable {
                     fieldCard.getText().isEmpty() ||
                     comboGender.getValue() == null) {
 
-                throw new ErrorException("Por favor, rellena todos los campos.",
-                        "Por favor, rellena todos los campos.");
+                throw new ErrorException("Error al registrar", "Por favor, rellena todos los campos.");
             }
 
             // Comprobamos que las contraseñas coinciden
             if (!fieldPass.getText().equals(fieldPass2.getText())) {
-                throw new ErrorException("Las contraseñas no coinciden.", "Las contraseñas no coinciden.");
+                throw new ErrorException("Error al registrar", "Las contraseñas no coinciden.");
             }
 
             // Comprobamos formato del correo
             if (!fieldGmail.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                throw new ErrorException("Correo electrónico no válido.", "Correo electrónico no válido.");
+                throw new ErrorException("Error al registrar", "Correo electrónico no válido.");
             }
 
             // Comprobamos que teléfono y tarjeta son números
@@ -214,21 +223,21 @@ public class AdminViewController implements Initializable {
                 tel = Integer.parseInt(fieldTel.getText());
                 card = Integer.parseInt(fieldCard.getText());
             } catch (NumberFormatException e) {
-                throw new ErrorException("Teléfono o número de tarjeta inválidos (deben ser numéricos).",
+                throw new ErrorException("Error al registrar",
                         "Teléfono o número de tarjeta inválidos (deben ser numéricos).");
             }
 
             // Si todo es correcto → actualizamos el objeto y llamamos a BD
-            user.setUser_name(fieldUser.getText());
-            user.setName_(fieldName.getText());
-            user.setSurname(fieldSurname.getText());
-            user.setEmail(fieldGmail.getText());
-            user.setTelephone(tel);
-            user.setCard_no(card);
-            user.setGender(comboGender.getValue());
-            user.setPasswd(fieldPass.getText());
+            currentUser.setUser_name(fieldUser.getText());
+            currentUser.setName_(fieldName.getText());
+            currentUser.setSurname(fieldSurname.getText());
+            currentUser.setEmail(fieldGmail.getText());
+            currentUser.setTelephone(tel);
+            currentUser.setCard_no(card);
+            currentUser.setGender(comboGender.getValue());
+            currentUser.setPasswd(fieldPass.getText());
 
-            boolean ok = con.updateUser(user);
+            boolean ok = con.updateUser(currentUser);
 
             if (ok) {
                 showAlert("Usuario actualizado correctamente.", Alert.AlertType.INFORMATION);
@@ -244,10 +253,10 @@ public class AdminViewController implements Initializable {
     }
 
     /**
-     * Muestra una alerta con el mensaje y el tipo especificados.
+     * Muestra una alerta al usuario con el mensaje y tipo especificados.
      * 
-     * @param msg  Mensaje a mostrar en la alerta.
-     * @param type Tipo de alerta (INFORMATION, ERROR, etc.).
+     * @param msg  El mensaje a mostrar en la alerta
+     * @param type El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
      */
     private void showAlert(String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
@@ -257,10 +266,9 @@ public class AdminViewController implements Initializable {
     }
 
     /**
-     * Hace los campos editables o no según el parámetro editable.
+     * Configura la edicion de los campos de la interfaz.
      * 
-     * @param editable true para hacer los campos editables, false para hacerlos no
-     *                 editables.
+     * @param editable Indica si los campos son editables o no
      */
     private void setEditableFields(boolean editable) {
 
@@ -269,48 +277,12 @@ public class AdminViewController implements Initializable {
         fieldSurname.setEditable(editable);
         fieldTel.setEditable(editable);
         fieldCard.setEditable(editable);
-        comboGender.setDisable(!editable);
+        comboGender.setDisable(!editable); // 👈 este es el truco
         fieldPass.setEditable(editable);
         fieldPass2.setEditable(editable);
     }
 
     /**
-     * Maneja el evento de eliminar un usuario.
-     * 
-     * @param event Evento de acción.
-     */
-    @FXML
-    private void onDelete(ActionEvent event) {
-        try {
-            String selectedUsername = comboUsers.getValue();
-            if (selectedUsername == null || selectedUsername.isEmpty()) {
-                throw new ErrorException("Por favor, selecciona un usuario para eliminar.",
-                        "Por favor, selecciona un usuario para eliminar.");
-            }
-
-            User_ user = users.get(selectedUsername);
-            if (user == null) {
-                throw new ErrorException("Usuario no encontrado.", "Usuario no encontrado.");
-            }
-
-            boolean ok = con.deleteUser(user.getUser_name(), user.getUser_code());
-            if (ok) {
-                showAlert("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
-                comboUsers.getItems().remove(user.getUser_name());
-                users.remove(user.getUser_name());
-                clearFields();
-                setEditableFields(false);
-                btnSave.setDisable(true);
-                btnModify.setDisable(true);
-            } else {
-                throw new ErrorException("Error al eliminar el usuario.", "Error al eliminar el usuario.");
-            }
-        } catch (ErrorException e) {
-            showAlert(e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-
-     /**
      * Maneja el evento del botón "Mostrar Contraseña".
      * Alterna entre mostrar y ocultar las contraseñas en texto plano.
      * 
@@ -338,17 +310,40 @@ public class AdminViewController implements Initializable {
     }
 
     /**
-     * Limpia los campos del formulario.
+     * Maneja el evento del botón "Eliminar".
+     * Abre la ventana de eliminación de usuario y cierra la ventana actual de
+     * modificación.
+     * 
+     * @param event El evento de acción que desencadenó este método
      */
-    private void clearFields() {
-        fieldUser.clear();
-        fieldName.clear();
-        fieldSurname.clear();
-        fieldGmail.clear();
-        fieldTel.clear();
-        fieldCard.clear();
-        fieldPass.clear();
-        fieldPass2.clear();
-        comboGender.setValue(null);
+    @FXML
+    private void onDelete(ActionEvent event) {
+        try {
+            // Cargar el FXML de la ventana de login
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DropOutWindow.fxml"));
+            Parent root = loader.load();
+            String username = fieldUser.getText();
+            DropOutController controller = loader.getController();
+            controller.setUsername(username);
+
+            // Crear la escena y ventana (Stage)
+            Stage stage = new Stage();
+            stage.setTitle("Eliminar usuario");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.show();
+
+            // Cerrar la ventana actual
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error al volver");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo abrir la ventana de login.");
+            alert.showAndWait();
+        }
     }
+
 }

@@ -10,9 +10,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="backgroundPanel" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #94B4C1;;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.LoginWindowController">
+<AnchorPane id="backgroundPanel" fx:id="backgroundPanel" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #94B4C1;;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.LoginWindowController">
     <children>
-        <Button id="LoginBtn" fx:id="loginBtn" layoutX="122.0" layoutY="328.0" onAction="#handleButtonAction" prefHeight="31.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Log In" textAlignment="CENTER" textFill="WHITE">
+        <Button id="loginBtn" fx:id="loginBtn" layoutX="122.0" layoutY="328.0" onAction="#onLogin" prefHeight="31.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Log In" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="SansSerif Bold" size="20.0" />
          </font></Button>
@@ -40,12 +40,12 @@
             <Font name="SansSerif Bold" size="20.0" />
          </font>
       </Label>
-      <Label id="LogInLabel" fx:id="loginLabel" layoutX="273.0" layoutY="25.0" prefHeight="23.0" prefWidth="68.0" text="Log In" textFill="#213448">
+      <Label id="loginLabel" fx:id="loginLabel" layoutX="273.0" layoutY="25.0" prefHeight="23.0" prefWidth="68.0" text="Log In" textFill="#213448">
          <font>
             <Font name="SansSerif Bold" size="20.0" />
          </font>
       </Label>
-      <Button id="SignUpBtn" fx:id="signupBtn" layoutX="307.0" layoutY="328.0" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+      <Button id="signupBtn" fx:id="signupBtn" layoutX="307.0" layoutY="328.0" onAction="#onSignUp" prefHeight="37.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="SansSerif Bold" size="20.0" />
          </font>

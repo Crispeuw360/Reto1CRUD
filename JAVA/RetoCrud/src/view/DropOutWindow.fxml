@@ -10,16 +10,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="467.0" prefWidth="582.0" style="-fx-background-color: #94B4C1;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="467.0" prefWidth="582.0" style="-fx-background-color: #94B4C1;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.DropOutController">
     <children>
-        <Button id="ConfirmBtn" fx:id="ConfirmBtn" layoutX="280.0" layoutY="371.0" onAction="#handleButtonAction" prefHeight="31.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Confirm" textAlignment="CENTER" textFill="WHITE">
+        <Button id="ConfirmBtn" fx:id="ConfirmBtn" layoutX="280.0" layoutY="371.0" onAction="#onDelete" prefHeight="31.0" prefWidth="175.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Confirm" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="SansSerif Bold" size="20.0" />
          </font></Button>
-        <Label id="invisibleLabel" fx:id="label" layoutX="21.0" layoutY="422.0" minHeight="16" minWidth="69" prefHeight="21.0" prefWidth="201.0" textFill="#213448">
-         <font>
-            <Font name="SansSerif Bold" size="17.0" />
-         </font></Label>
       <PasswordField id="passwordField" fx:id="passwordField" layoutX="233.0" layoutY="203.0" prefHeight="31.0" prefWidth="283.0" style="-fx-background-color: #D9D9D9; -fx-background-radius: 50;">
          <font>
             <Font name="SansSerif Regular" size="15.0" />
@@ -57,7 +53,7 @@
             <Font name="SansSerif Bold" size="20.0" />
          </font>
       </Label>
-      <Button id="ConfirmBtn" fx:id="exitBtn" layoutY="6.0" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="91.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Exit" textAlignment="CENTER" textFill="WHITE">
+      <Button id="exitBtn" fx:id="exitBtn" layoutY="6.0" onAction="#OnBack" prefHeight="37.0" prefWidth="91.0" style="-fx-background-color: #213448; -fx-background-radius: 50;" text="Exit" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="SansSerif Bold" size="20.0" />
          </font>

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import java.net.URL?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -12,10 +13,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="514.0" prefWidth="721.0" style="-fx-background-color: #94B4C1;" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.AdminViewController">
-    
+<AnchorPane id="AnchorPane" prefHeight="514.0" prefWidth="721.0" style="-fx-background-color: #94B4C1;" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.ModifyWindowController">
    <children>
-      <Button id="btnBack" fx:id="btnBack" layoutX="596.0" layoutY="18.0" mnemonicParsing="false" onAction="#onBack" prefHeight="30.0" prefWidth="110.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Close session" textFill="WHITE">
+      <Button id="btnBack" fx:id="btnBack" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onBack" prefHeight="30.0" prefWidth="110.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Close session" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font></Button>
@@ -45,7 +45,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label id="passLabel2" fx:id="passLabel2" layoutX="180.0" layoutY="385.0" text="Repete password:">
+      <Label id="passLabel2" fx:id="passLabel2" layoutX="180.0" layoutY="385.0" text="Repeat password:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -66,7 +66,7 @@
          </font>
       </Label>
       <Button id="btnShow" fx:id="btnShow" layoutX="583.0" layoutY="343.0" mnemonicParsing="false" onAction="#showPass" prefHeight="26.0" prefWidth="26.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" />
-      <Label layoutX="260.0" layoutY="18.0" text="Admin Panel">
+      <Label layoutX="278.0" layoutY="14.0" text="User Panel">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -88,12 +88,10 @@
             <Font size="14.0" />
          </font>
       </Button>
-      <ComboBox fx:id="comboUsers" layoutX="14.0" layoutY="59.0" prefWidth="150.0" style="-fx-background-radius: 50;" />
-      <Button id="btnDelete" fx:id="btnDelete" layoutX="448.0" layoutY="444.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Delete" textFill="WHITE">
+      <Button id="btnDelete" fx:id="btnDelete" layoutX="442.0" layoutY="444.0" mnemonicParsing="false" onAction="#onDelete" prefHeight="38.0" prefWidth="80.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" text="Delete" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      
    </children>
 </AnchorPane>
