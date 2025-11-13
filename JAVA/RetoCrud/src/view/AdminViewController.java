@@ -172,6 +172,7 @@ public class AdminViewController implements Initializable {
         setEditableFields(true);
         comboGender.getItems().addAll("Male", "Female", "Other");
         btnSave.setDisable(false);
+        btnModify.setDisable(true);
     }
 
     /**

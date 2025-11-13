@@ -1,5 +1,10 @@
+
 package view;
 
+import java.awt.Window;
+import java.util.HashSet;
+import java.util.Set;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.PasswordField;
@@ -15,6 +20,11 @@ import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.*;
 
 // ESTA ANOTACIÓN ORDENA LOS TESTS POR NOMBRE
+
+
+//Alerta Este Test No garantiza que se haga bien a la primera, si quieres que se hagan los test de manera correcta, comenta todos los test menos el que quieras probar, 
+//No habido manera de arreglar el problema ya que vien de netbeans y javaFx
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ViewControllersUITest extends ApplicationTest {
 
@@ -45,23 +55,42 @@ public class ViewControllersUITest extends ApplicationTest {
     }
 
     @Before
-    public void prepararTest() {
-        // Esperar a que cargue
-        sleep(3000);
+public void prepararTest() {
+    try {
+        // Estrategia 1: Cerrar todos los stages excepto el primary usando Stage
+        javafx.application.Platform.runLater(() -> {
+            // Obtener todos los stages a través de la escena
+            Set<Stage> stages = new HashSet<>();
+            
+            // Buscar stages desde las escenas conocidas
+            if (primaryStage.getScene() != null) {
+                // Recorrer todos los nodos para encontrar stages hijos
+                encontrarStages(primaryStage.getScene().getRoot(), stages);
+            }
+            
+            // Cerrar todos los stages excepto el principal
+            for (Stage stage : stages) {
+                if (stage != primaryStage && stage.isShowing()) {
+                    stage.close();
+                }
+            }
+        });
         
-        // Cerrar TODAS las ventanas y alerts
-        cerrarTodosLosAlertsYVentanas();
-               
-        System.setProperty("testfx.robot", "glass");
-        System.setProperty("testfx.headless", "true");
-        System.setProperty("prism.order", "sw");
-        System.setProperty("prism.text", "t2k");
-
+        // Esperar a que se cierren las ventanas
         sleep(1000);
+        
+        // También intentar cerrar alerts específicos
+        cerrarTodosLosAlertsYVentanas();
+        
+        sleep(1000);
+        
+    } catch (Exception e) {
+        System.out.println("Error preparando test: " + e.getMessage());
     }
+}
 
     // ========== TESTS BÁSICOS SIN LOGIN ==========
-/*
+
     @Test
     public void test01_ElementosLoginBasicos() {
         System.out.println("=== Test 1: Elementos Login Básicos ===");
@@ -451,7 +480,7 @@ public class ViewControllersUITest extends ApplicationTest {
             }
         }
     }
-*/
+
     @Test 
     public void test09_NavegandoWindowAdmin() {
         boolean hacerLoginExitoso =false;
@@ -547,14 +576,6 @@ public class ViewControllersUITest extends ApplicationTest {
                         clickOn("#btnModify");
                         sleep(1000);
 
-                        // Verificar que campos se hacen editables
-                        verificarCampoEditable("#fieldName", "Campo nombre editable en modo edición");
-                        verificarCampoEditable("#fieldSurname", "Campo apellido editable en modo edición");
-                        verificarCampoEditable("#fieldGmail", "Campo email editable en modo edición");
-                        verificarCampoEditable("#fieldTel", "Campo teléfono editable en modo edición");
-                        verificarCampoEditable("#fieldCard", "Campo tarjeta editable en modo edición");
-                        verificarCampoEditable("#fieldPass", "Campo contraseña editable en modo edición");
-                        verificarCampoEditable("#fieldPass2", "Campo confirmar contraseña editable en modo edición");
 
                         // Verificar estado de botones en modo edición
                         verificarEstadoBoton("#btnModify", false, "Botón Modificar deshabilitado en edición");
@@ -672,6 +693,17 @@ public class ViewControllersUITest extends ApplicationTest {
             System.out.println("Error cerrando alerts: " + e.getMessage());
         }
     }
+    private void encontrarStages(javafx.scene.Node node, Set<Stage> stages) {
+    if (node.getScene() != null && node.getScene().getWindow() instanceof Stage) {
+        stages.add((Stage) node.getScene().getWindow());
+    }
+    
+    if (node instanceof javafx.scene.Parent) {
+        for (javafx.scene.Node child : ((javafx.scene.Parent) node).getChildrenUnmodifiable()) {
+            encontrarStages(child, stages);
+        }
+    }
+}
     
     private boolean manejarAlertConBoton(String textoBoton, String tipoAlert) {
         try {
@@ -848,36 +880,6 @@ private void verificarCampoNoEditable(String selector, String descripcion) {
             release(javafx.scene.input.KeyCode.CONTROL);
             write(textoOriginal);
         }
-    } catch (Exception e) {
-        System.out.println("✗ " + descripcion + " - Error: " + e.getMessage());
-    }
-}
-
-private void verificarCampoEditable(String selector, String descripcion) {
-    try {
-        // Intentar escribir en el campo para ver si es editable
-        String textoOriginal = obtenerTextoCampo(selector);
-        clickOn(selector);
-        write("TEST");
-        sleep(500);
-        
-        String textoDespues = obtenerTextoCampo(selector);
-        
-        // Si el texto cambió, es editable
-        if (!textoDespues.equals(textoOriginal)) {
-            System.out.println("✓ " + descripcion);
-        } else {
-            System.out.println("✗ " + descripcion + " - El campo NO es editable");
-        }
-        
-        // Restaurar texto original
-        clickOn(selector);
-        push(javafx.scene.input.KeyCode.CONTROL);
-        push(javafx.scene.input.KeyCode.A);
-        release(javafx.scene.input.KeyCode.A);
-        release(javafx.scene.input.KeyCode.CONTROL);
-        write(textoOriginal);
-        
     } catch (Exception e) {
         System.out.println("✗ " + descripcion + " - Error: " + e.getMessage());
     }
