@@ -75,6 +75,7 @@ public class AdminViewController implements Initializable {
 
     private User_ user;
     private Map<String, User_> users = new HashMap<>();
+    private boolean passwordVisible = false;
     private Controller con = new Controller();
     @FXML
     private Button btnDelete;
@@ -93,6 +94,7 @@ public class AdminViewController implements Initializable {
         // Rellenar el ComboBox con sus usernames
         comboUsers.getItems().clear();
         comboUsers.getItems().addAll(users.keySet());
+        setEditableFields(false);
 
         btnSave.setDisable(true);
         btnModify.setDisable(true);
@@ -120,7 +122,6 @@ public class AdminViewController implements Initializable {
                 fieldPass2.setText(user.getPasswd());
                 comboGender.setValue(user.getGender());
                 setEditableFields(false);
-                btnSave.setDisable(false);
                 btnModify.setDisable(false);
 
             }
@@ -170,6 +171,7 @@ public class AdminViewController implements Initializable {
         // implementar modificar
         setEditableFields(true);
         comboGender.getItems().addAll("Male", "Female", "Other");
+        btnSave.setDisable(false);
     }
 
     /**
@@ -304,6 +306,33 @@ public class AdminViewController implements Initializable {
             }
         } catch (ErrorException e) {
             showAlert(e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+     /**
+     * Maneja el evento del botón "Mostrar Contraseña".
+     * Alterna entre mostrar y ocultar las contraseñas en texto plano.
+     * 
+     * @param event El evento de acción que desencadenó este método
+     */
+    @FXML
+    private void showPass(ActionEvent event) {
+        passwordVisible = !passwordVisible;
+
+        if (passwordVisible) {
+            // Mostrar contraseñas en texto plano
+            fieldPass.setPromptText(fieldPass.getText());
+            fieldPass2.setPromptText(fieldPass2.getText());
+            fieldPass.setText("");
+            fieldPass2.setText("");
+            btnShow.setText("👁"); // Cambiar ícono del botón
+        } else {
+            // Ocultar contraseñas (volver a modo puntos)
+            fieldPass.setText(fieldPass.getPromptText());
+            fieldPass2.setText(fieldPass2.getPromptText());
+            fieldPass.setPromptText("");
+            fieldPass2.setPromptText("");
+            btnShow.setText("👁"); // Mantener mismo ícono o cambiar si prefieres
         }
     }
 

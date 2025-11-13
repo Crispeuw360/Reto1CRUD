@@ -65,13 +65,13 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button id="btnShow" fx:id="btnShow" layoutX="583.0" layoutY="343.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" />
+      <Button id="btnShow" fx:id="btnShow" layoutX="583.0" layoutY="343.0" mnemonicParsing="false" onAction="#showPass" prefHeight="26.0" prefWidth="26.0" style="-fx-background-radius: 50; -fx-background-color: #213448;" />
       <Label layoutX="260.0" layoutY="18.0" text="Admin Panel">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <TextField id="fieldUser" fx:id="fieldCard" layoutX="348.0" layoutY="215.0" prefHeight="26.0" prefWidth="225.0" style="-fx-background-radius: 50;" />
+      <TextField id="fieldCard" fx:id="fieldCard" layoutX="348.0" layoutY="215.0" prefHeight="26.0" prefWidth="225.0" style="-fx-background-radius: 50;" />
       <Label id="cardLabel" fx:id="cardLabel" layoutX="183.0" layoutY="215.0" text="Card number:">
          <font>
             <Font name="System Bold" size="18.0" />

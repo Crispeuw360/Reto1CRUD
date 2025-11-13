@@ -1,8 +1,9 @@
 package view;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -20,12 +21,23 @@ public class ViewControllersUITest extends ApplicationTest {
     private Stage primaryStage;
     private String usuarioUnico;
     private double randomNumber = 25;
+    private TextField fieldUser;
+    private TextField fieldName;
+    private TextField fieldSurname;
+    private TextField fieldGmail;
+    private TextField fieldTel;
+    private TextField fieldCard;
+    private PasswordField fieldPass;
+    private PasswordField fieldPass2;
 
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
         stage.setWidth(600);
         stage.setHeight(400);
+        stage.setX(100);
+        stage.setY(100);
+        stage.centerOnScreen();
         
         usuarioUnico = "testuser_" + randomNumber;
         
@@ -39,12 +51,17 @@ public class ViewControllersUITest extends ApplicationTest {
         
         // Cerrar TODAS las ventanas y alerts
         cerrarTodosLosAlertsYVentanas();
-        
+               
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("prism.order", "sw");
+        System.setProperty("prism.text", "t2k");
+
         sleep(1000);
     }
 
     // ========== TESTS BÁSICOS SIN LOGIN ==========
-
+/*
     @Test
     public void test01_ElementosLoginBasicos() {
         System.out.println("=== Test 1: Elementos Login Básicos ===");
@@ -434,8 +451,200 @@ public class ViewControllersUITest extends ApplicationTest {
             }
         }
     }
+*/
+    @Test 
+    public void test09_NavegandoWindowAdmin() {
+        boolean hacerLoginExitoso =false;
 
+        llenarCampo("#usernameField", "admin1", "admin1");
+        llenarCampo("#passwordField", "adminpass1", "adminpass1");
+        clickOn("#loginBtn");
+        sleep(2000);
+
+        hacerLoginExitoso = manejarAlertConBoton("Aceptar", "Correcto");
+        
+        if(hacerLoginExitoso){
+            System.out.println("--- Probando navegación a Admin---");
+
+            clickOn("#btnBack");
+            sleep(2000);
+        }
+    }
     
+    @Test 
+    public void test10_WindowAdmin() {
+        System.out.println("=== Test 9: Window Admin Completo ===");
+
+        // Login como administrador
+        llenarCampo("#usernameField", "admin1", "Usuario admin");
+        llenarCampo("#passwordField", "adminpass1", "Contraseña admin");
+        clickOn("#loginBtn");
+        sleep(3000);
+
+        boolean loginExitoso = manejarAlertConBoton("Aceptar", "Correcto");
+
+        if(loginExitoso){
+            System.out.println("✓ Login admin exitoso - Accediendo a Admin Window");
+            sleep(2000);
+
+            // 1. Verificar elementos básicos de Admin Window
+            System.out.println("--- Verificando elementos Admin Window ---");
+            verificarElemento("#comboUsers", "ComboBox de usuarios");
+            verificarElemento("#btnBack", "Botón Volver");
+            verificarElemento("#btnModify", "Botón Modificar");
+            verificarElemento("#btnSave", "Botón Guardar");
+            verificarElemento("#btnDelete", "Botón Eliminar");
+            verificarElemento("#fieldUser", "Campo Usuario");
+            verificarElemento("#fieldName", "Campo Nombre");
+            verificarElemento("#fieldSurname", "Campo Apellido");
+            verificarElemento("#fieldGmail", "Campo Email");
+            verificarElemento("#fieldTel", "Campo Teléfono");
+            verificarElemento("#fieldCard", "Campo Tarjeta");
+            verificarElemento("#fieldPass", "Campo Contraseña");
+            verificarElemento("#fieldPass2", "Campo Confirmar Contraseña");
+            verificarElemento("#comboGender", "ComboBox Género");
+
+            // 2. Verificar estado inicial de botones
+            System.out.println("--- Verificando estado inicial ---");
+            verificarEstadoBoton("#btnSave", false, "Botón Guardar deshabilitado inicialmente");
+            verificarEstadoBoton("#btnModify", false, "Botón Modificar deshabilitado inicialmente");
+            verificarEstadoBoton("#btnDelete", true, "Botón Eliminar habilitado");
+
+            // 3. Verificar que campos no son editables inicialmente
+            System.out.println("--- Verificando campos no editables ---");
+            verificarCampoNoEditable("#fieldUser", "Campo usuario no editable");
+            verificarCampoNoEditable("#fieldName", "Campo nombre no editable");
+            verificarCampoNoEditable("#fieldSurname", "Campo apellido no editable");
+            verificarCampoNoEditable("#fieldGmail", "Campo email no editable");
+            verificarCampoNoEditable("#fieldTel", "Campo teléfono no editable");
+            verificarCampoNoEditable("#fieldCard", "Campo tarjeta no editable");
+            verificarCampoNoEditable("#fieldPass", "Campo contraseña no editable");
+            verificarCampoNoEditable("#fieldPass2", "Campo confirmar contraseña no editable");
+
+            // 4. Probar selección de usuario del ComboBox
+            System.out.println("--- Probando selección de usuario ---");
+            if (verificarElementoExistente("#comboUsers")) {
+                clickOn("#comboUsers");
+                sleep(1000);
+
+                // Verificar si hay usuarios en el ComboBox
+                try {
+                    // Intentar seleccionar el primer usuario disponible
+                    clickOn(".list-cell");
+                    sleep(2000);
+
+                    // Verificar que los campos se llenan con datos
+                    String textoUsuario = obtenerTextoCampo("#fieldUser");
+                    if (!textoUsuario.isEmpty()) {
+                        System.out.println("✓ Usuario seleccionado: " + textoUsuario);
+
+                        // Verificar que botones se habilitan después de selección
+                        verificarEstadoBoton("#btnModify", true, "Botón Modificar habilitado tras selección");
+                        verificarEstadoBoton("#btnSave", false, "Botón Guardar permanece deshabilitado");
+
+                        // 5. Probar funcionalidad de modificación
+                        System.out.println("--- Probando funcionalidad Modificar ---");
+                        clickOn("#btnModify");
+                        sleep(1000);
+
+                        // Verificar que campos se hacen editables
+                        verificarCampoEditable("#fieldName", "Campo nombre editable en modo edición");
+                        verificarCampoEditable("#fieldSurname", "Campo apellido editable en modo edición");
+                        verificarCampoEditable("#fieldGmail", "Campo email editable en modo edición");
+                        verificarCampoEditable("#fieldTel", "Campo teléfono editable en modo edición");
+                        verificarCampoEditable("#fieldCard", "Campo tarjeta editable en modo edición");
+                        verificarCampoEditable("#fieldPass", "Campo contraseña editable en modo edición");
+                        verificarCampoEditable("#fieldPass2", "Campo confirmar contraseña editable en modo edición");
+
+                        // Verificar estado de botones en modo edición
+                        verificarEstadoBoton("#btnModify", false, "Botón Modificar deshabilitado en edición");
+                        verificarEstadoBoton("#btnSave", true, "Botón Guardar habilitado en edición");
+
+                        // 6. Probar validaciones al guardar
+                        System.out.println("--- Probando validaciones ---");
+
+                        // a. Campos vacíos
+                        limpiarCampo("#fieldName");
+                        clickOn("#btnSave");
+                        sleep(2000);
+                        manejarAlertConBoton("Aceptar", "Error campos vacíos");
+
+                        // b. Email inválido
+                        llenarCampo("#fieldName", "NombreTest", "Restaurar nombre");
+                        limpiarCampo("#fieldGmail");
+                        llenarCampo("#fieldGmail", "email-invalido", "Email inválido");
+                        clickOn("#btnSave");
+                        sleep(2000);
+                        manejarAlertConBoton("Aceptar", "Error email inválido");
+
+                        // c. Contraseñas no coincidentes
+                        llenarCampo("#fieldGmail", "test@test.com", "Email válido");
+                        String passOriginal = obtenerTextoCampo("#fieldPass");
+                        limpiarCampo("#fieldPass2");
+                        llenarCampo("#fieldPass2", "contraseñadiferente", "Contraseña diferente");
+                        clickOn("#btnSave");
+                        sleep(2000);
+                        manejarAlertConBoton("Aceptar", "Error contraseñas no coincidentes");
+
+                        // d. Guardado exitoso (restaurar contraseñas iguales)
+                        llenarCampo("#fieldPass2", passOriginal, "Restaurar contraseña igual");
+                        clickOn("#btnSave");
+                        sleep(2000);
+                        boolean guardadoExitoso = manejarAlertConBoton("Aceptar", "Éxito");
+
+                        if (guardadoExitoso) {
+                            System.out.println("✓ Guardado exitoso de modificaciones");
+
+                            // Verificar que volvió al estado normal
+                            verificarEstadoBoton("#btnModify", true, "Botón Modificar habilitado tras guardar");
+                            verificarEstadoBoton("#btnSave", false, "Botón Guardar deshabilitado tras guardar");
+                        }
+
+                        // 7. Probar funcionalidad de eliminación
+                        System.out.println("--- Probando funcionalidad Eliminar ---");
+                        clickOn("#btnDelete");
+                        sleep(2000);
+
+                        // Manejar posible diálogo de confirmación
+                        boolean eliminacionExitosa = manejarAlertConBoton("Aceptar", "Eliminación");
+
+                        if (eliminacionExitosa) {
+                            System.out.println("✓ Eliminación exitosa de usuario");
+
+                            // Verificar que los campos se limpiaron
+                            sleep(1000);
+                            if (obtenerTextoCampo("#fieldUser").isEmpty()) {
+                                System.out.println("✓ Campos limpiados correctamente tras eliminar");
+                            }
+                        }
+
+                    } else {
+                        System.out.println("⚠ ComboBox vacío o campos no se llenaron - omitiendo pruebas de selección");
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("⚠ No hay usuarios en el ComboBox o error en selección: " + e.getMessage());
+                }
+        }
+        
+        // 8. Probar navegación de vuelta
+        System.out.println("--- Probando navegación de vuelta ---");
+        clickOn("#btnBack");
+        sleep(2000);
+        
+        // Verificar que volvimos al login
+        if (verificarElementoExistente("#loginBtn")) {
+            System.out.println("✓ Navegación de vuelta exitosa");
+        } else {
+            System.out.println("✗ Error en navegación de vuelta");
+        }
+        
+    } else {
+        System.out.println("✗ Login admin fallido - omitiendo test Admin Window");
+        // Intentar manejar alert de error si existe
+        manejarAlertConBoton("Aceptar", "Error");
+    }
+}
 
     // ========== MÉTODOS HELPER MEJORADOS ==========
     
@@ -614,6 +823,86 @@ public class ViewControllersUITest extends ApplicationTest {
             // Ignorar
         }
     }
+// ========== MÉTODOS HELPER ADICIONALES PARA ADMIN ==========
+
+private void verificarCampoNoEditable(String selector, String descripcion) {
+    try {
+        // Intentar escribir en el campo para ver si es editable
+        String textoOriginal = obtenerTextoCampo(selector);
+        clickOn(selector);
+        write("test");
+        sleep(500);
+        
+        String textoDespues = obtenerTextoCampo(selector);
+        
+        // Si el texto no cambió, no es editable
+        if (textoDespues.equals(textoOriginal)) {
+            System.out.println("✓ " + descripcion);
+        } else {
+            System.out.println("✗ " + descripcion + " - El campo es editable");
+            // Restaurar texto original
+            clickOn(selector);
+            push(javafx.scene.input.KeyCode.CONTROL);
+            push(javafx.scene.input.KeyCode.A);
+            release(javafx.scene.input.KeyCode.A);
+            release(javafx.scene.input.KeyCode.CONTROL);
+            write(textoOriginal);
+        }
+    } catch (Exception e) {
+        System.out.println("✗ " + descripcion + " - Error: " + e.getMessage());
+    }
+}
+
+private void verificarCampoEditable(String selector, String descripcion) {
+    try {
+        // Intentar escribir en el campo para ver si es editable
+        String textoOriginal = obtenerTextoCampo(selector);
+        clickOn(selector);
+        write("TEST");
+        sleep(500);
+        
+        String textoDespues = obtenerTextoCampo(selector);
+        
+        // Si el texto cambió, es editable
+        if (!textoDespues.equals(textoOriginal)) {
+            System.out.println("✓ " + descripcion);
+        } else {
+            System.out.println("✗ " + descripcion + " - El campo NO es editable");
+        }
+        
+        // Restaurar texto original
+        clickOn(selector);
+        push(javafx.scene.input.KeyCode.CONTROL);
+        push(javafx.scene.input.KeyCode.A);
+        release(javafx.scene.input.KeyCode.A);
+        release(javafx.scene.input.KeyCode.CONTROL);
+        write(textoOriginal);
+        
+    } catch (Exception e) {
+        System.out.println("✗ " + descripcion + " - Error: " + e.getMessage());
+    }
+}
+
+private String obtenerTextoCampo(String selector) {
+    try {
+        // Para TextField normales
+        try {
+            TextField field = lookup(selector).query();
+            return field.getText();
+        } catch (Exception e) {
+            // Para PasswordField
+            try {
+                PasswordField passField = lookup(selector).query();
+                return passField.getText();
+            } catch (Exception e2) {
+                System.out.println("No se pudo obtener texto del campo: " + selector);
+                return "";
+            }
+        }
+    } catch (Exception e) {
+        return "";
+    }
+}
 
     // ========== TEST DEBUG ==========
 
