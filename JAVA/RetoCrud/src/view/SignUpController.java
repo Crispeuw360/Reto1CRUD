@@ -200,7 +200,7 @@ public class SignUpController implements Initializable {
                 if (creado){
                     System.out.println("Creado correctamente");
                     showSuccess("Usuario creado correctamente");
-                    clearFields();
+                    clearFields();                    
                 }
             }
         }
