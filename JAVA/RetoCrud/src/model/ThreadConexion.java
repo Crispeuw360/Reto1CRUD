@@ -33,7 +33,7 @@ public class ThreadConexion extends Thread {
     public void run() {
         try {
             System.out.println("Conexión establecida");
-            Thread.sleep(30000); 
+            Thread.sleep(10000); 
             System.out.println("Conexión liberada");
         } catch (InterruptedException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

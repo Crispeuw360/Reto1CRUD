@@ -55,7 +55,7 @@ public class ImplementsBD implements UserDAO {
     private void openConnection() {
         try {
             // ✅ INTENTAR OBTENER CONEXIÓN
-            con = ConexionPoolDBCP.getConnection();
+            con = ConexionPoolDBCP.getDataSource().getConnection();
             if (con != null && !con.isClosed()) {
                 System.out.println(" Conexión abierta exitosamente");
             } else {
@@ -63,13 +63,6 @@ public class ImplementsBD implements UserDAO {
                 con = null;
             }
         } catch (SQLException e) {
-            // ✅ MANEJO SILENCIOSO DE ERRORES
-            if (e.getMessage().contains("Timeout")) {
-                System.out.println(" Timeout: Sistema ocupado. Se reseteará en " +
-                        (30000 - ConexionPoolDBCP.getTimeSinceLastReset()) / 1000 + " segundos");
-            } else {
-                System.out.println(" Error al abrir conexión: " + e.getMessage());
-            }
             con = null;
         }
     }
@@ -369,8 +362,10 @@ public class ImplementsBD implements UserDAO {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println(" Error al obtener todos los usuarios");
+            System.out.println(" Error al eliminar el usuario");
             
+        } finally {
+            closeConnection();
         }
 
         return usersMap;

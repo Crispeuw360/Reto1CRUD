@@ -15,21 +15,16 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  *
  * @author PIKAIN
- * 
- * 
+ *
+ *
  */
 public class ConexionPoolDBCP {
+
     // Instancia única del pool
     private static BasicDataSource dataSource;
-    
-    // VARIABLE CONFIGURABLE para el número de permisos
-    private static final int MAX_CONCURRENT_CONNECTIONS = 20;
-    
-    // Semáforo configurable - CORREGIDO
-    private static final Semaphore connectionSemaphore = new Semaphore(MAX_CONCURRENT_CONNECTIONS, true);
-    private static final AtomicLong lastResetTime = new AtomicLong(System.currentTimeMillis());
-    private static final long RESET_INTERVAL = 30000; // 30 segundos
-    
+
+   
+
     // Configuración estática del pool
     static {
         dataSource = new BasicDataSource();
@@ -38,21 +33,20 @@ public class ConexionPoolDBCP {
         dataSource.setUsername("root");
         dataSource.setPassword("abcd*1234");
 
-        // Pool configurado según el número máximo de conexiones
+        // Configuración del pool
         dataSource.setInitialSize(1);
-        dataSource.setMaxTotal(MAX_CONCURRENT_CONNECTIONS);
-        dataSource.setMinIdle(1);
-        dataSource.setMaxIdle(MAX_CONCURRENT_CONNECTIONS);
-        dataSource.setMaxWaitMillis(5000); // 5 segundos
+        dataSource.setMaxTotal(3);       // max connections
+        dataSource.setMaxIdle(1);        // max innactive connections
+        dataSource.setMinIdle(1);        // min innactive connections
 
-        // Configuraciones adicionales para evitar problemas
         dataSource.setValidationQuery("SELECT 1");
         dataSource.setTestOnBorrow(true);
-        dataSource.setTestOnReturn(false);
         dataSource.setTestWhileIdle(true);
-        dataSource.setTimeBetweenEvictionRunsMillis(30000);
-        
-        System.out.println(" Pool configurado con " + MAX_CONCURRENT_CONNECTIONS + " conexiones máximas");
+        dataSource.setMaxWaitMillis(5000);
+        dataSource.setRemoveAbandonedOnBorrow(true);
+        dataSource.setLogAbandoned(true);
+
+        System.out.println(" Pool configurado con " + dataSource.getMaxTotal() + " conexiones máximas");
     }
 
     /*
@@ -60,115 +54,7 @@ public class ConexionPoolDBCP {
      * 
      * @return una conexión de la base de datos
      */
-    public static Connection getConnection() throws SQLException {
-        try {
-            // VERIFICAR Y RESETEAR PRIMERO
-            checkAndResetSemaphore();
-            
-            int availableBefore = connectionSemaphore.availablePermits();
-            System.out.println(" Intentando conexión. Disponibles: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS + 
-                             " - Tiempo desde reset: " + (System.currentTimeMillis() - lastResetTime.get()) + "ms");
-            
-            // Intentar adquirir un permiso (timeout de 10 segundos)
-            if (connectionSemaphore.tryAcquire(10, TimeUnit.SECONDS)) {
-                int availableAfter = connectionSemaphore.availablePermits();
-                System.out.println(" Conexión adquirida. Restantes: " + availableAfter + "/" + MAX_CONCURRENT_CONNECTIONS);
-                
-                // Obtener la conexión real del pool
-                Connection conn = dataSource.getConnection();
-                if (conn != null && !conn.isClosed()) {
-                    return conn;
-                } else {
-                    // Si la conexión es inválida, liberar el permiso
-                    connectionSemaphore.release();
-                    throw new SQLException("Conexión nula o cerrada obtenida del pool");
-                }
-            } else {
-                // VERIFICAR SI ES MOMENTO DE RESET
-                checkAndResetSemaphore();
-                System.out.println(" TIMEOUT - Estado: " + getSemaphoreStatus());
-                throw new SQLException("Timeout: No se pudo obtener conexión. " + getSemaphoreStatus());
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new SQLException("Interrupción mientras se esperaba por conexión", e);
-        }
-    }
-    
-    /*
-     * Método para verificar y resetear el semáforo
-     */
-    private static void checkAndResetSemaphore() {
-        long currentTime = System.currentTimeMillis();
-        long lastReset = lastResetTime.get();
-        
-        if (currentTime - lastReset > RESET_INTERVAL) {
-            // Solo un hilo puede resetear a la vez
-            if (lastResetTime.compareAndSet(lastReset, currentTime)) {
-                // ✅ RESET COMPLETO del semáforo
-                int drained = connectionSemaphore.drainPermits();
-                connectionSemaphore.release(MAX_CONCURRENT_CONNECTIONS);
-                
-                System.out.println(" RESET AUTOMÁTICO - " + drained + " permisos drenados, " + 
-                                 MAX_CONCURRENT_CONNECTIONS + " liberados. Tiempo: " + (currentTime - lastReset) + "ms");
-            }
-        }
-    }
-    
-    /*
-     * Método para liberar una conexión
-     */
-    public static void releaseConnection() {
-        int availableBefore = connectionSemaphore.availablePermits();
-        
-        // VERIFICAR ANTES DE LIBERAR
-        if (availableBefore < MAX_CONCURRENT_CONNECTIONS) {
-            connectionSemaphore.release();
-            System.out.println(" Conexión liberada. Disponibles: " + (availableBefore + 1) + "/" + MAX_CONCURRENT_CONNECTIONS);
-        } else {
-            System.out.println(" Intento de liberar conexión cuando ya hay máximo disponible: " + availableBefore + "/" + MAX_CONCURRENT_CONNECTIONS);
-        }
-        
-        // VERIFICAR SI ES MOMENTO DE RESET después de liberar
-        checkAndResetSemaphore();
-    }
-
-    /*
-     * Método para verificar el estado del semáforo
-     * 
-     * @return el estado del semáforo
-     */
-    public static String getSemaphoreStatus() {
-        long timeSinceReset = System.currentTimeMillis() - lastResetTime.get();
-        return "Conexiones disponibles: " + connectionSemaphore.availablePermits() + 
-               "/" + MAX_CONCURRENT_CONNECTIONS + " - Tiempo desde último reset: " + 
-               timeSinceReset + "ms" + (timeSinceReset > RESET_INTERVAL ? " (RESET PENDIENTE)" : "");
-    }
-    
-    /*
-     * Método para obtener el número máximo de conexiones
-     * 
-     * @return el número máximo de conexiones
-     */
-    public static int getMaxConnections() {
-        return MAX_CONCURRENT_CONNECTIONS;
-    }
-    
-    /*
-     * Método para obtener el número de conexiones disponibles
-     * 
-     * @return el número de conexiones disponibles
-     */
-    public static int getAvailableConnections() {
-        return connectionSemaphore.availablePermits();
-    }
-    
-    /*
-     * Método para obtener el tiempo desde el último reset
-     * 
-     * @return el tiempo desde el último reset
-     */
-    public static long getTimeSinceLastReset() {
-        return System.currentTimeMillis() - lastResetTime.get();
+    public static BasicDataSource getDataSource() {
+        return dataSource;
     }
 }
