@@ -16,10 +16,12 @@ import java.util.Map;
  *
  * @author PIKAIN
  * @version 1.0
- * 
+ *
  */
 public class ImplementsBD implements UserDAO {
+
     private Connection con;
+    private ConexionPoolStack pool = new ConexionPoolStack("jdbc:mysql://localhost:3306/retocrud?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true", "root", "abcd*1234", 3);
     private PreparedStatement stmt;
     private ThreadConexion threadConexion;
 
@@ -34,7 +36,7 @@ public class ImplementsBD implements UserDAO {
             + "INNER JOIN User_ u ON p.user_code = u.Profile_code "
             + "WHERE p.user_name = ?";
     private final String sqlAdmin = "SELECT user_code FROM Profile_ WHERE user_name = ?";
-    private final String sqlAdmin2 =  "SELECT COUNT(*) FROM Admin_ WHERE Profile_code = ?";
+    private final String sqlAdmin2 = "SELECT COUNT(*) FROM Admin_ WHERE Profile_code = ?";
     private final String sqlUpdateUser = " UPDATE User_ SET card_no=?, gender=? WHERE Profile_code=?";
     private final String sqlUpdateProfile = "UPDATE Profile_ SET passwd = ?, email = ?, name_ = ?, Surname = ?, Telephone = ? WHERE user_name = ?";
     private final String sqlDeleteProfile = "DELETE FROM Profile_ WHERE user_name = ? ";
@@ -43,19 +45,20 @@ public class ImplementsBD implements UserDAO {
             + "FROM Profile_ p "
             + "INNER JOIN User_ u ON p.user_code = u.Profile_code";
 
-
     public ImplementsBD() {
+
     }
 
     /**
      * Abre una conexión con la base de datos.
+     *
      * @param ConexionPoolDBCP
      * @throws SQLException Si ocurre un error al abrir la conexión.
      */
     private void openConnection() {
+        con = null;
         try {
-            // ✅ INTENTAR OBTENER CONEXIÓN
-            con = ConexionPoolDBCP.getDataSource().getConnection();
+            con = pool.getConnection();
             if (con != null && !con.isClosed()) {
                 System.out.println(" Conexión abierta exitosamente");
             } else {
@@ -69,7 +72,7 @@ public class ImplementsBD implements UserDAO {
 
     /**
      * Verifica si existe un usuario con el nombre de usuario proporcionado.
-     * 
+     *
      * @param username Nombre de usuario a verificar.
      * @return true si el usuario existe, false en caso contrario.
      */
@@ -101,7 +104,9 @@ public class ImplementsBD implements UserDAO {
                 System.out.println(" Error en existUser: " + e.getMessage());
             }
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return exists;
@@ -109,8 +114,9 @@ public class ImplementsBD implements UserDAO {
 
     /**
      * Inserta un nuevo usuario en la base de datos.
-     * 
-     * @param user Objeto {@link User_} que contiene los datos del usuario a insertar.
+     *
+     * @param user Objeto {@link User_} que contiene los datos del usuario a
+     * insertar.
      * @return true si la inserción es exitosa, false en caso contrario.
      */
     public boolean insertUser(User_ user) {
@@ -151,7 +157,9 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return inserted;
@@ -159,12 +167,12 @@ public class ImplementsBD implements UserDAO {
 
     /**
      * Elimina un usuario de la base de datos.
-     * 
+     *
      * @param username Nombre de usuario del usuario a eliminar.
      * @param profile_code Código del perfil del usuario a eliminar.
      * @return true si la eliminación es exitosa, false en caso contrario.
      */
-    public boolean deleteUser(String username,int profile_code) {
+    public boolean deleteUser(String username, int profile_code) {
         boolean deleted = false;
         threadConexion = new ThreadConexion(con);
         threadConexion.start();
@@ -182,9 +190,11 @@ public class ImplementsBD implements UserDAO {
             stmt.close();
         } catch (SQLException e) {
             System.out.println(" Error al eliminar el usuario");
-            
+
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return deleted;
@@ -192,7 +202,7 @@ public class ImplementsBD implements UserDAO {
 
     /**
      * Valida la contraseña de un usuario.
-     * 
+     *
      * @param username Nombre de usuario para validar.
      * @param password Contraseña a validar.
      * @return true si la contraseña es correcta, false en caso contrario.
@@ -228,16 +238,19 @@ public class ImplementsBD implements UserDAO {
                 System.out.println(" Error en validatePassword: " + e.getMessage());
             }
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
         return valid;
     }
 
     /**
      * Obtiene un usuario por su nombre de usuario.
-     * 
+     *
      * @param username Nombre de usuario del usuario a obtener.
-     * @return Objeto {@link User_} que contiene los datos del usuario, o null si no se encuentra.
+     * @return Objeto {@link User_} que contiene los datos del usuario, o null
+     * si no se encuentra.
      */
     public User_ getUserByUsername(String username) {
         User_ user = null;
@@ -276,16 +289,19 @@ public class ImplementsBD implements UserDAO {
                 System.out.println(" Error en getUserByUsername: " + e.getMessage());
             }
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return user;
     }
-    
+
     /**
      * Actualiza los datos de un usuario en la base de datos.
-     * 
-     * @param user Objeto {@link User_} que contiene los datos del usuario a actualizar.
+     *
+     * @param user Objeto {@link User_} que contiene los datos del usuario a
+     * actualizar.
      * @return true si la actualización es exitosa, false en caso contrario.
      */
     public boolean updateUser(User_ user) {
@@ -317,9 +333,11 @@ public class ImplementsBD implements UserDAO {
             stmt.close();
         } catch (SQLException e) {
             System.out.println(" Error al actualizar el usuario");
-            
+
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return updated;
@@ -327,8 +345,9 @@ public class ImplementsBD implements UserDAO {
 
     /**
      * Obtiene todos los usuarios almacenados en la base de datos.
-     * 
-     * @return Mapa que contiene los usuarios, donde la clave es el nombre de usuario y el valor es el objeto {@link User_}.
+     *
+     * @return Mapa que contiene los usuarios, donde la clave es el nombre de
+     * usuario y el valor es el objeto {@link User_}.
      */
     public Map<String, User_> getAllUsers() {
         Map<String, User_> usersMap = new HashMap<>();
@@ -363,17 +382,19 @@ public class ImplementsBD implements UserDAO {
             stmt.close();
         } catch (SQLException e) {
             System.out.println(" Error al eliminar el usuario");
-            
+
         } finally {
-            closeConnection();
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return usersMap;
     }
-    
+
     /**
      * Verifica si un usuario es administrador.
-     * 
+     *
      * @param username Nombre de usuario del usuario a verificar.
      * @return true si el usuario es administrador, false en caso contrario.
      */
@@ -411,23 +432,14 @@ public class ImplementsBD implements UserDAO {
 
         } catch (SQLException e) {
             System.out.println(" Error comprobando si el usuario es administrador");
-            
+
+        } finally {
+            if (con != null) {
+                pool.releaseConnection(con);
+            }
         }
 
         return admin;
     }
 
-    /**
-     * Método para cerrar la conexión.
-     */
-    private void closeConnection() {
-        try {
-            if (con != null) {
-                con.close(); // Esto devuelve la conexión al pool
-            }
-        } catch (SQLException e) {
-            System.out.println("Error al cerrar la conexión");
-            
-        }
-    }
 }
