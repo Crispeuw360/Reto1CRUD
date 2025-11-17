@@ -5,6 +5,7 @@
  */
 package model;
 
+import Exception.ErrorException;
 import java.sql.Connection;
 
 import java.sql.DriverManager;
@@ -13,36 +14,59 @@ import java.util.Stack;
 
 public class ConexionPoolStack {
 
-    private final String url;
-    private final String username;
-    private final String password;
-    private final int maxPoolSize;
-    private final Stack<Connection> availableConnections = new Stack<>();
-    private int totalConnections = 0;
+    private static String url;
+    private static String username;
+    private static String password;
+    private static int maxPoolSize = 2;
+    private static Stack<Connection> availableConnections = new Stack<>();
+    private static int totalConnections = 0;
 
-    public ConexionPoolStack(String url, String username, String password, int maxPoolSize) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.maxPoolSize = maxPoolSize;
+    static {
+        try {
+            url = "jdbc:mysql://localhost:3306/retocrud?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true";
+            username = "root";
+            password = "abcd*1234";
+            
+            for (int i = 0; i < maxPoolSize; i++) {
+                Connection con = DriverManager.getConnection(url, username, password);
+                availableConnections.push(con);
+                totalConnections++;
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error configurating connections pool", e);
+        }
     }
 
-    public synchronized Connection getConnection() throws SQLException {
+    public synchronized Connection getConnection() throws ErrorException {
+        // 1. Usar conexiones disponibles primero
         if (!availableConnections.isEmpty()) {
-            return availableConnections.pop();
+            Connection con = availableConnections.pop();
+            System.out.println("🔵 Conexión obtenida del pool. Disponibles: " + availableConnections.size());
+            return con;
         }
+        
         if (totalConnections < maxPoolSize) {
-            Connection conn = DriverManager.getConnection(url, username, password);
-            totalConnections++;
-            return conn;
+            try{
+                Connection con = DriverManager.getConnection(url, username, password);
+                totalConnections++;
+                return con;
+                        
+            }catch(SQLException e){
+                throw new ErrorException("error en el sql ","error en el sql ");
+            }
         }
+        
         try {
+            System.out.println("⏳ No hay conexiones disponibles. Esperando...");
             this.wait();
+            // Cuando se notifica, intentar de nuevo
+            return getConnection();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new SQLException("Interrumpido mientras se espera conexión", e);
+            throw new ErrorException("Interrumpido esperando conexión", e.getMessage());
         }
-        return getConnection();
+        
     }
 
     public synchronized void releaseConnection(Connection conn) {
@@ -57,4 +81,4 @@ public class ConexionPoolStack {
         }
         totalConnections = 0;
     }
-    }
+}

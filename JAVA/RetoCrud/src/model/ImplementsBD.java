@@ -5,12 +5,15 @@
  */
 package model;
 
+import Exception.ErrorException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +24,7 @@ import java.util.Map;
 public class ImplementsBD implements UserDAO {
 
     private Connection con;
-    private ConexionPoolStack pool = new ConexionPoolStack("jdbc:mysql://localhost:3306/retocrud?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true", "root", "abcd*1234", 3);
+    private static final ConexionPoolStack pool = new ConexionPoolStack();
     private PreparedStatement stmt;
     private ThreadConexion threadConexion;
 
@@ -55,20 +58,7 @@ public class ImplementsBD implements UserDAO {
      * @param ConexionPoolDBCP
      * @throws SQLException Si ocurre un error al abrir la conexión.
      */
-    private void openConnection() {
-        con = null;
-        try {
-            con = pool.getConnection();
-            if (con != null && !con.isClosed()) {
-                System.out.println(" Conexión abierta exitosamente");
-            } else {
-                System.out.println(" Conexión nula o cerrada obtenida del pool");
-                con = null;
-            }
-        } catch (SQLException e) {
-            con = null;
-        }
-    }
+    
 
     /**
      * Verifica si existe un usuario con el nombre de usuario proporcionado.
@@ -78,9 +68,9 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean existUser(String username) {
         boolean exists = false;
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
             if (con == null) {
                 System.out.println(" No hay conexiones disponibles en este momento. Reintentando más tarde...");
                 return false; // NO mostrar error, solo retornar false silenciosamente
@@ -103,6 +93,8 @@ public class ImplementsBD implements UserDAO {
             } else {
                 System.out.println(" Error en existUser: " + e.getMessage());
             }
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
@@ -121,10 +113,11 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean insertUser(User_ user) {
         boolean inserted = false;
-        threadConexion = new ThreadConexion(con);
-        threadConexion.start();
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
+            threadConexion = new ThreadConexion(con,pool);
+            threadConexion.start();
 
             // Paso 1: Insertar en Profile_
             stmt = con.prepareStatement(sqlProfile, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -156,6 +149,8 @@ public class ImplementsBD implements UserDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
@@ -174,11 +169,11 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean deleteUser(String username, int profile_code) {
         boolean deleted = false;
-        threadConexion = new ThreadConexion(con);
-        threadConexion.start();
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
+            threadConexion = new ThreadConexion(con,pool);
+            threadConexion.start();
             if (con == null) {
                 System.out.println(" No hay conexiones disponibles para eliminar usuario");
                 return false; // Sin error en rojo
@@ -191,10 +186,10 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println(" Error al eliminar el usuario");
 
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            if (con != null) {
-                pool.releaseConnection(con);
-            }
+            
         }
 
         return deleted;
@@ -209,9 +204,9 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean validatePassword(String username, String password) {
         boolean valid = false;
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
             if (con == null) {
                 System.out.println(" No hay conexiones disponibles para validar password");
                 return false; // Sin error en rojo
@@ -237,6 +232,8 @@ public class ImplementsBD implements UserDAO {
             } else {
                 System.out.println(" Error en validatePassword: " + e.getMessage());
             }
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
@@ -254,9 +251,9 @@ public class ImplementsBD implements UserDAO {
      */
     public User_ getUserByUsername(String username) {
         User_ user = null;
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
             if (con == null) {
                 System.out.println("⏳ No hay conexiones disponibles para obtener usuario");
                 return null; // ❌ Sin error en rojo
@@ -288,6 +285,8 @@ public class ImplementsBD implements UserDAO {
             } else {
                 System.out.println(" Error en getUserByUsername: " + e.getMessage());
             }
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
@@ -306,11 +305,11 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean updateUser(User_ user) {
         boolean updated = false;
-        threadConexion = new ThreadConexion(con);
-        threadConexion.start();
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
+            threadConexion = new ThreadConexion(con,pool);
+            threadConexion.start();
 
             // Actualizamos la tabla Profile_
             stmt = con.prepareStatement(sqlUpdateProfile);
@@ -334,10 +333,10 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println(" Error al actualizar el usuario");
 
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            if (con != null) {
-                pool.releaseConnection(con);
-            }
+            
         }
 
         return updated;
@@ -351,12 +350,11 @@ public class ImplementsBD implements UserDAO {
      */
     public Map<String, User_> getAllUsers() {
         Map<String, User_> usersMap = new HashMap<>();
-        threadConexion = new ThreadConexion(con);
-        threadConexion.start();
-
+        con = null;
         try {
-            openConnection();
-
+            con = pool.getConnection();
+            threadConexion = new ThreadConexion(con,pool);
+            threadConexion.start();
             // Consulta conjunta Profile_ + User_
             stmt = con.prepareStatement(sqlListUsers);
             ResultSet rs = stmt.executeQuery();
@@ -383,6 +381,8 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println(" Error al eliminar el usuario");
 
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
@@ -400,9 +400,9 @@ public class ImplementsBD implements UserDAO {
      */
     public boolean isAdmin(String username) {
         boolean admin = false;
-
+        con = null;
         try {
-            openConnection();
+            con = pool.getConnection();
 
             // 🔹 Obtener el ID del usuario en Profile_
             stmt = con.prepareStatement(sqlAdmin);
@@ -433,6 +433,8 @@ public class ImplementsBD implements UserDAO {
         } catch (SQLException e) {
             System.out.println(" Error comprobando si el usuario es administrador");
 
+        } catch (ErrorException ex) {
+            Logger.getLogger(ImplementsBD.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (con != null) {
                 pool.releaseConnection(con);
